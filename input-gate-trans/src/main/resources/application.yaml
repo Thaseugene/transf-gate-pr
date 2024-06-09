@@ -1,0 +1,14 @@
+ktor:
+    application:
+        modules:
+            - com.trans.ApplicationKt.module
+    deployment:
+        port: 8080
+
+
+database:
+    driverClass: "org.h2.Driver"
+    url: "jdbc:h2:mem:testdb"
+    user: "root"
+    password: "password"
+    maxPoolSize: 10
