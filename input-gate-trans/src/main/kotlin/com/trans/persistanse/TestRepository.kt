@@ -1,6 +1,10 @@
 package com.trans.persistanse
 
 import com.trans.domain.Test
+import com.trans.exception.ExpCode
+import com.trans.exception.RepositoryException
+import com.trans.service.mapping.toTest
+import com.trans.service.mapping.updateFields
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface TestRepository {
@@ -27,17 +31,17 @@ class TestRepositoryImpl : TestRepository {
     }
 
     override fun delete(id: Long) = transaction {
-        val existingEntity = findExistingById(id) ?: throw RuntimeException("Test with id = $id doesn't exist")
+        val existingEntity = findExistingById(id) ?: throw RepositoryException(ExpCode.NOT_FOUND, "Test with id = $id doesn't exist")
         existingEntity.delete()
     }
 
     override fun update(test: Test): Test = transaction {
-        val existingEntity = findExistingById(test.id) ?: throw RuntimeException("Test with id = $id doesn't exist")
+        val existingEntity = findExistingById(test.id) ?: throw RepositoryException(ExpCode.NOT_FOUND, "Test with id = $id doesn't exist")
         existingEntity.updateFields(test).toTest()
     }
 
     override fun findById(id: Long): Test = transaction {
-        findExistingById(id)?.toTest() ?: throw RuntimeException("Test with id = $id doesn't exist")
+        findExistingById(id)?.toTest() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Test with id = $id doesn't exist")
     }
 
     override fun findAll(): List<Test> = transaction {
@@ -46,17 +50,4 @@ class TestRepositoryImpl : TestRepository {
 
     private fun findExistingById(id: Long): TestEntity? = TestEntity.findById(id)
 
-}
-
-
-fun TestEntity.toTest() = Test(
-    id = this.id.value,
-    name = this.name,
-    description = this.description
-)
-
-fun TestEntity.updateFields(test: Test): TestEntity {
-    this.name = test.name
-    this.description = test.description
-    return this
 }

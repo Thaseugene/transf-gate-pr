@@ -1,5 +1,6 @@
 package com.trans
 
+import com.trans.configuration.ApplicationConfiguration
 import com.trans.configuration.configureApplication
 import com.trans.configuration.configureDatabase
 import com.trans.configuration.invokeMigrationProcess
@@ -12,9 +13,12 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    invokeMigrationProcess(configureDatabase(configureApplication()))
+
+    val appConfiguration: ApplicationConfiguration = configureApplication()
+
+    invokeMigrationProcess(configureDatabase(appConfiguration))
     configureDependencies()
     configureSerialization()
-    configureKafka()
+    configureKafka(appConfiguration.kafkaConfig)
     configureRouting()
 }

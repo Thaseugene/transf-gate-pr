@@ -31,4 +31,5 @@ class DefaultDatabaseFactory(configuration: ApplicationConfiguration) : Database
         config.validate()
         return HikariDataSource(config)
     }
+
 }

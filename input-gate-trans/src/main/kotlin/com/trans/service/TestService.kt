@@ -4,6 +4,7 @@ import com.trans.dto.TestDto
 import com.trans.persistanse.TestRepository
 import com.trans.service.mapping.toResponse
 import com.trans.service.mapping.toTest
+import com.trans.utils.extractId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -20,6 +21,7 @@ interface TestService {
 class TestServiceImpl(
     private val testRepository: TestRepository
 ): TestService {
+
     private val logger: Logger = LoggerFactory.getLogger(TestService::class.java)
 
     override fun createTest(test: TestDto): TestDto {
@@ -45,7 +47,5 @@ class TestServiceImpl(
         logger.info("Start finding process for all test models")
         return testRepository.findAll().map { it.toResponse() }
     }
-
-    private fun String?.extractId(): Long = this?.toLong() ?: throw RuntimeException("Incorrect format for id")
 
 }

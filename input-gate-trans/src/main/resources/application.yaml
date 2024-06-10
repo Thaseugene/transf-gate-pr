@@ -12,3 +12,12 @@ database:
     user: "root"
     password: "password"
     maxPoolSize: 10
+
+kafka:
+    registryUrl: "http://localhost:8081"
+    groupId: "test-group-id"
+    producerClientId: "producerTestClientId"
+    consumerClientId: "consumerTestClientId"
+    topicName: "test-event-topic"
+    bootstrapServers:
+        - "http://localhost:29092"
