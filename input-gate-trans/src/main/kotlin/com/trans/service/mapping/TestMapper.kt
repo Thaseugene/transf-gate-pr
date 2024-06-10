@@ -1,6 +1,8 @@
 package com.trans.service.mapping
 
+import com.trans.domain.Event
 import com.trans.domain.Test
+import com.trans.dto.EventRecord
 import com.trans.dto.TestDto
 import com.trans.persistanse.TestEntity
 
@@ -28,3 +30,9 @@ fun TestEntity.updateFields(test: Test): TestEntity {
     this.description = test.description
     return this
 }
+
+//fun Event.toRecord(): EventRecord = EventRecord(
+//    this.description,
+//    System.currentTimeMillis(),
+//    this.eventName
+//)

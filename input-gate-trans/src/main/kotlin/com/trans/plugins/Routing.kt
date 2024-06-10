@@ -1,6 +1,7 @@
 package com.trans.plugins
 
 import com.trans.api.TestController
+import com.trans.domain.Event
 import com.trans.dto.Error
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -10,6 +11,7 @@ import io.ktor.server.resources.Resources
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
+import java.util.UUID
 
 fun Application.configureRouting() {
 
@@ -46,6 +48,17 @@ fun Application.configureRouting() {
             }
             put {
                 testController.updateTestModel(call)
+            }
+        }
+        route("/record") {
+            get("/send") {
+                this@configureRouting.sendEvent(Event(
+                    "test-event-topic",
+                    UUID.randomUUID().toString(),
+                    "Test event",
+                    System.currentTimeMillis(),
+                    "Amazing first test kafka event"
+                ))
             }
         }
     }

@@ -1,15 +1,21 @@
 package com.trans.plugins
 
 import com.trans.configuration.KafkaInnerConfig
+import com.trans.domain.Event
+import com.trans.dto.EventRecord
 import io.github.flaxoos.ktor.server.plugins.kafka.*
+import io.github.flaxoos.ktor.server.plugins.kafka.components.fromRecord
+import io.github.flaxoos.ktor.server.plugins.kafka.components.toRecord
 import io.ktor.client.*
 import io.ktor.server.application.*
+import org.apache.kafka.clients.producer.ProducerRecord
+import java.util.concurrent.TimeUnit
 
 fun Application.configureKafka(kafkaConfig: KafkaInnerConfig) {
     install(Kafka) {
         schemaRegistryUrl = kafkaConfig.registryUrl
-        val topicName = TopicName.named(kafkaConfig.topicName)
-        topic(topicName) {
+        val eventTopic = TopicName.named(kafkaConfig.topicName)
+        topic(eventTopic) {
             partitions = 1
             replicas = 1
             configs {
@@ -28,18 +34,15 @@ fun Application.configureKafka(kafkaConfig: KafkaInnerConfig) {
             groupId = kafkaConfig.groupId
             clientId = kafkaConfig.consumerClientId //<-- Override common properties
         }
-        configureConsumers(topicName)
+        configureConsumers(eventTopic)
         registerSchemas {
-            using { // <-- optionally provide a client, by default CIO is used
-                HttpClient()
-            }
-            // MyRecord::class at myTopic // <-- Will register schema upon startup
+            Event::class at eventTopic
         }
     }
 }
 
-fun Application.sendUser(str: String) {
-    this.kafkaProducer
+fun Application.sendEvent(event: Event) {
+    this.kafkaProducer?.send(ProducerRecord(event.topicName, event.requestId, event.toRecord()))?.get(100, TimeUnit.MILLISECONDS)
 }
 
 fun Application.handleMessage() {
@@ -49,7 +52,8 @@ fun Application.handleMessage() {
 private fun KafkaConfig.configureConsumers(topicName: TopicName) {
     consumerConfig {
         consumerRecordHandler(topicName) { record ->
-            // Do something with record
+            val event = fromRecord<Event>(record.value())
+            log.info("Event is recorded - $event")
         }
 
     }
