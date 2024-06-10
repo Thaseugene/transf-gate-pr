@@ -1,0 +1,62 @@
+package com.trans.persistanse
+
+import com.trans.domain.Test
+import org.jetbrains.exposed.sql.transactions.transaction
+
+interface TestRepository {
+
+    fun save(test: Test): Test
+    fun delete(id: Long)
+    fun update(test: Test): Test
+    fun findById(id: Long): Test
+    fun findAll(): List<Test>
+
+}
+
+class TestRepositoryImpl : TestRepository {
+
+    override fun save(test: Test): Test = transaction {
+        val createdEntity = TestEntity.new {
+            name = test.name
+            description = test.description
+        }
+        test.copy(
+            id = createdEntity.id.value,
+            description = createdEntity.description
+        )
+    }
+
+    override fun delete(id: Long) = transaction {
+        val existingEntity = findExistingById(id) ?: throw RuntimeException("Test with id = $id doesn't exist")
+        existingEntity.delete()
+    }
+
+    override fun update(test: Test): Test = transaction {
+        val existingEntity = findExistingById(test.id) ?: throw RuntimeException("Test with id = $id doesn't exist")
+        existingEntity.updateFields(test).toTest()
+    }
+
+    override fun findById(id: Long): Test = transaction {
+        findExistingById(id)?.toTest() ?: throw RuntimeException("Test with id = $id doesn't exist")
+    }
+
+    override fun findAll(): List<Test> = transaction {
+        TestEntity.all().map { it.toTest() }
+    }
+
+    private fun findExistingById(id: Long): TestEntity? = TestEntity.findById(id)
+
+}
+
+
+fun TestEntity.toTest() = Test(
+    id = this.id.value,
+    name = this.name,
+    description = this.description
+)
+
+fun TestEntity.updateFields(test: Test): TestEntity {
+    this.name = test.name
+    this.description = test.description
+    return this
+}

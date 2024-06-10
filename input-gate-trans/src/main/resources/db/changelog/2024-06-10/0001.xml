@@ -5,11 +5,19 @@
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="0" author="Budnichenka YS">
-        <createTable tableName="test">
-            <column name="id" type="BIGINT" autoIncrement="true">
+        <createTable tableName="TEST">
+            <column name="ID" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" unique="true"/>
             </column>
-            <column name="description" type="VARCHAR(255) NOT NULL"/>
+            <column name="DESCRIPTION" type="VARCHAR(255) NOT NULL"/>
+            <column name="NAME" type="VARCHAR(255) NOT NULL"/>
         </createTable>
+    </changeSet>
+    
+    <changeSet id="1" author="Budnichenka YS">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="TEST"/>
+        </preConditions>
+        <sqlFile path="db/changelog/2024-06-10/0002.sql" />
     </changeSet>
 </databaseChangeLog>
