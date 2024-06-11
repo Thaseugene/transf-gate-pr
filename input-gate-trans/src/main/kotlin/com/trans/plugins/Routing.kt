@@ -3,6 +3,7 @@ package com.trans.plugins
 import com.trans.api.TestController
 import com.trans.domain.Event
 import com.trans.dto.Error
+import com.trans.service.StreamingService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -16,6 +17,7 @@ import java.util.UUID
 fun Application.configureRouting() {
 
     val testController by inject<TestController>()
+    val streamingService by inject<StreamingService>()
 
     install(StatusPages) {
         exception<Throwable> { call, cause ->

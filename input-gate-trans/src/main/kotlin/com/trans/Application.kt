@@ -17,7 +17,7 @@ fun Application.module() {
     val appConfiguration: ApplicationConfiguration = configureApplication()
 
     invokeMigrationProcess(configureDatabase(appConfiguration))
-    configureDependencies()
+    configureDependencies(this)
     configureSerialization()
     configureKafka(appConfiguration.kafkaConfig)
     configureRouting()

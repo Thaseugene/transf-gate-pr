@@ -14,10 +14,10 @@ database:
     maxPoolSize: 10
 
 kafka:
-    registryUrl: "http://localhost:8081"
+    registryUrl: "http://127.0.0.1:8081"
     groupId: "test-group-id"
     producerClientId: "producerTestClientId"
     consumerClientId: "consumerTestClientId"
     topicName: "test-event-topic"
     bootstrapServers:
-        - "http://localhost:29092"
+        - "http://127.0.0.1:29092"
