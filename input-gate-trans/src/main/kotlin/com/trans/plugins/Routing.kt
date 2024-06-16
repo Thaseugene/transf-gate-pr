@@ -3,7 +3,7 @@ package com.trans.plugins
 import com.trans.api.TestController
 import com.trans.domain.Event
 import com.trans.dto.Error
-import com.trans.service.StreamingService
+//import com.trans.service.StreamingService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -17,7 +17,8 @@ import java.util.UUID
 fun Application.configureRouting() {
 
     val testController by inject<TestController>()
-    val streamingService by inject<StreamingService>()
+//    val streamingService by inject<StreamingService>()
+    val kafkaService by inject<KafkaService>()
 
     install(StatusPages) {
         exception<Throwable> { call, cause ->
@@ -54,7 +55,7 @@ fun Application.configureRouting() {
         }
         route("/record") {
             get("/send") {
-                this@configureRouting.sendEvent(Event(
+                kafkaService.sendMessage(Event(
                     "test-event-topic",
                     UUID.randomUUID().toString(),
                     "Test event",
