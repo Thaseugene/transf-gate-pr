@@ -3,6 +3,7 @@ package com.trans.persistanse
 import com.trans.domain.Test
 import com.trans.exception.ExpCode
 import com.trans.exception.RepositoryException
+import com.trans.persistanse.entity.TestEntity
 import com.trans.service.mapping.toTest
 import com.trans.service.mapping.updateFields
 import org.jetbrains.exposed.sql.transactions.transaction

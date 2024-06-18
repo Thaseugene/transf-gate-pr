@@ -1,4 +1,4 @@
-package com.trans.persistanse
+package com.trans.persistanse.entity
 
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass

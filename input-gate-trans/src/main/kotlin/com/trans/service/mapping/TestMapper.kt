@@ -1,10 +1,8 @@
 package com.trans.service.mapping
 
-import com.trans.domain.Event
 import com.trans.domain.Test
-import com.trans.dto.EventRecord
 import com.trans.dto.TestDto
-import com.trans.persistanse.TestEntity
+import com.trans.persistanse.entity.TestEntity
 
 fun TestDto.toTest(): Test = Test(
     this.id,
