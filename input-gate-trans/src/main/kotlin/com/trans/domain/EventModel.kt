@@ -5,7 +5,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-private const val DEFAULT_DATE_ZONE = "UTC"
+const val DEFAULT_DATE_ZONE = "UTC"
 
 @Serializable
 data class EventModel(

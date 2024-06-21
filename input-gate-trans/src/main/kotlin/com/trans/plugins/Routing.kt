@@ -1,5 +1,6 @@
 package com.trans.plugins
 
+import com.trans.api.EventController
 import com.trans.api.TestController
 import com.trans.dto.Error
 //import com.trans.service.StreamingService
@@ -15,8 +16,7 @@ import org.koin.ktor.ext.inject
 fun Application.configureRouting() {
 
     val testController by inject<TestController>()
-//    val streamingService by inject<StreamingService>()
-    val kafkaService by inject<KafkaService>()
+    val eventController by inject<EventController>()
 
     install(StatusPages) {
         exception<Throwable> { call, cause ->
@@ -51,15 +51,21 @@ fun Application.configureRouting() {
                 testController.updateTestModel(call)
             }
         }
-        route("/record") {
-            get("/send") {
-//                kafkaService.sendMessage(Event(
-//                    "test-event-topic",
-//                    UUID.randomUUID().toString(),
-//                    "Test event",
-//                    System.currentTimeMillis(),
-//                    "Amazing first test kafka event"
-//                ))
+        route("api/event") {
+            get("/all") {
+                eventController.getAllEventModels(call)
+            }
+            get("{id}") {
+                eventController.getExistingEventModel(call)
+            }
+            delete("{id}") {
+                eventController.deleteEventModel(call)
+            }
+            post {
+                eventController.createEventModel(call)
+            }
+            put {
+                eventController.updateEventModel(call)
             }
         }
     }
