@@ -39,17 +39,26 @@ class EventRepositoryImpl : EventRepository {
     }
 
     override fun delete(id: Long) {
-        val existing = findExistingById(id) ?: throw RepositoryException(ExpCode.NOT_FOUND, "Event with id = $id doesn't exists")
+        val existing =
+            findExistingById(id) ?: throw RepositoryException(
+                ExpCode.NOT_FOUND,
+                "Event with id = $id doesn't exists")
         existing.delete()
     }
 
     override fun update(event: EventModel): EventModel = transaction {
-        val existing = findExistingById(event.id) ?: throw RepositoryException(ExpCode.NOT_FOUND, "Event with id = ${event.id} doesn't exists")
+        val existing = findExistingById(event.id) ?: throw RepositoryException(
+            ExpCode.NOT_FOUND,
+            "Event with id = ${event.id} doesn't exists"
+        )
         existing.updateFields(event)
     }
 
     override fun findById(id: Long): EventModel = transaction {
-        findExistingById(id)?.toEventModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Event with id = $id doesn't exists")
+        findExistingById(id)?.toEventModel() ?: throw RepositoryException(
+            ExpCode.NOT_FOUND,
+            "Event with id = $id doesn't exists"
+        )
     }
 
     override fun findAll(): List<EventModel> = transaction {

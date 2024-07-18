@@ -8,8 +8,6 @@ import io.ktor.server.routing.*
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
         jackson()
+    }
 
-    }
-    routing {
-    }
 }

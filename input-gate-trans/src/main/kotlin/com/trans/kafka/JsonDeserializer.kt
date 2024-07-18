@@ -1,6 +1,7 @@
 package com.trans.kafka
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.apache.kafka.common.serialization.Deserializer
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory
 class JsonDeserializer<T> : Deserializer<T> {
 
     private val logger: Logger = LoggerFactory.getLogger(JsonDeserializer::class.java)
-    private lateinit var tClass: Class<T>
+    private lateinit var type: TypeReference<T>
 
     companion object {
         private val mapper: ObjectMapper = jacksonObjectMapper().apply {
@@ -19,21 +20,20 @@ class JsonDeserializer<T> : Deserializer<T> {
     }
 
     override fun configure(configs: Map<String, *>?, isKey: Boolean) {
-        val className = configs?.get("value.deserializer.class") as? String
-        if (className != null) {
-            tClass = Class.forName(className) as Class<T>
+        val typeValue = configs?.get("value.deserializer.type") as? TypeReference<*>
+        if (typeValue != null) {
+            type = typeValue as TypeReference<T>
         }
     }
 
     override fun deserialize(topic: String?, data: ByteArray?): T? {
         if (data == null) return null
         return try {
-            mapper.readValue(data, tClass)
+            mapper.readValue(data, type)
         } catch (e: Exception) {
             logger.error(e.message, e)
             null
         }
     }
 
-    override fun close() {}
 }

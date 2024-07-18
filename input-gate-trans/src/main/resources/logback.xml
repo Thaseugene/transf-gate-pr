@@ -9,5 +9,7 @@
     </root>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
-    <logger name="kafka" level="OFF"/>
+<!--    <logger name="org.apache.kafka.clients.consumer.KafkaConsumer" level="OFF"/>-->
+<!--    <logger name="org.apache.kafka.clients.NetworkClient" level="OFF"/>-->
+<!--    <logger name="org.apache.kafka.clients.consumer.internals.Fetcher" level="OFF"/>-->
 </configuration>
