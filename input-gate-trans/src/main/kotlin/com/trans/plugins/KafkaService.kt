@@ -70,7 +70,6 @@ class KafkaService(
         props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
         props[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java.name
         props[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = JsonSerializer::class.java.name
-//        props["value.serializer.class"] = EventRecord::class.java.name // Set the class type here
         return KafkaProducer(props)
     }
 
@@ -80,7 +79,7 @@ class KafkaService(
         props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.name
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java.name
-        props["value.deserializer.type"] = object: TypeReference<EventRecord>() {} // Set the class type here
+        props["value.deserializer.type"] = object: TypeReference<EventRecord>() {}
         props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
         return KafkaConsumer(props)
     }
