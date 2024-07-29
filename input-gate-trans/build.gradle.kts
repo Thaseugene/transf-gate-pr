@@ -30,6 +30,9 @@ repositories {
 
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
+    implementation("io.ktor:ktor-client-core-jvm")
+    implementation("io.ktor:ktor-client-cio-jvm")
+    implementation("io.ktor:ktor-client-logging-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
     implementation("org.apache.kafka:kafka-clients:3.4.0")
