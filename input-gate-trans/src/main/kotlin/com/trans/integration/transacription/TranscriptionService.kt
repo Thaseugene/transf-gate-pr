@@ -2,7 +2,9 @@ package com.trans.integration.transacription
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
@@ -32,71 +34,58 @@ data class TranscriptResponse(val id: String)
 @Serializable
 data class PollingResponse(val status: String, val text: String? = null, val error: String? = null)
 
-suspend fun uploadFile(path: String, apiKey: String): String = withContext(IO) {
-    val client = HttpClient(CIO) {
-
-        install(Logging) {
-            level = LogLevel.INFO
+class TranscriptionService() {
+    companion object {
+        val client = HttpClient(CIO) {
+            install(Logging) {
+                level = LogLevel.INFO
+            }
         }
 
+        val objectMapper: ObjectMapper = with(jacksonObjectMapper()) {
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        }
     }
-    val url = URL("https://api.assemblyai.com/v2/upload")
+}
+
+private const val UPLOAD_SERVICE_URL = "https://api.assemblyai.com/v2/upload"
+private const val TRANSCRIPT_URL = "https://api.assemblyai.com/v2/transcript"
+private const val RESULT_URL = "https://api.assemblyai.com/v2/transcript/%s"
+
+suspend fun uploadFile(path: String, apiKey: String): String = withContext(IO) {
     val file = File(path)
-    val response: HttpResponse = client.post("https://api.assemblyai.com/v2/upload") {
+    val response: HttpResponse = TranscriptionService.client.post(UPLOAD_SERVICE_URL) {
         contentType(ContentType.Application.OctetStream)
         bearerAuth(apiKey)
         setBody(file.readChannel())
     }
-
-    val objectMapper = jacksonObjectMapper()
-    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    val transcriptResponse = objectMapper.readValue(response.bodyAsText(), object : TypeReference<UploadResponse>() {})
-    println(transcriptResponse.upload_url)
+    val transcriptResponse = TranscriptionService.objectMapper.readValue(
+        response.bodyAsText(),
+        object : TypeReference<UploadResponse>() {})
     transcriptResponse.upload_url
 }
 
 suspend fun getTranscript(audioUrl: String, apiKey: String) = withContext(IO) {
-    val url = URL("https://api.assemblyai.com/v2/transcript")
-    val connection = url.openConnection() as HttpURLConnection
-    connection.requestMethod = "POST"
-    connection.setRequestProperty("Authorization", apiKey)
-    connection.setRequestProperty("Content-Type", "application/json")
-    connection.doOutput = true
-
-    val objectMapper = jacksonObjectMapper()
-
-    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    val requestData = objectMapper.writeValueAsString(TranscriptRequest(audioUrl))
-    connection.outputStream.use { output ->
-        output.write(requestData.toByteArray(Charsets.UTF_8))
+    val response: HttpResponse = TranscriptionService.client.post(TRANSCRIPT_URL) {
+        contentType(ContentType.Application.Json)
+        bearerAuth(apiKey)
+        setBody(TranscriptionService.objectMapper.writeValueAsString(TranscriptRequest(audioUrl)))
     }
-
-    val responseText = connection.inputStream.bufferedReader().use { it.readText() }
-    val transcriptResponse = objectMapper.readValue(responseText, object : TypeReference<TranscriptResponse>() {})
-    val pollingEndpoint = "https://api.assemblyai.com/v2/transcript/${transcriptResponse.id}"
-
-    val pollingConnection = URL(pollingEndpoint).openConnection() as HttpURLConnection
-//    pollingConnection.requestMethod = "GET"
-//    pollingConnection.setRequestProperty("Authorization", apiKey)
-//    delay(10000)
-//    val pollingResponseText = pollingConnection.inputStream.bufferedReader().use { it.readText() }
-//    println(pollingResponseText)
-//    val pollingResponse = objectMapper.readValue(pollingResponseText, PollingResponse::class.java)
-
+    val transcriptResponse = TranscriptionService.objectMapper.readValue(
+        response.bodyAsText(),
+        object : TypeReference<TranscriptResponse>() {})
+    val pollingEndpoint = RESULT_URL.format(transcriptResponse.id)
     println(checkResult(pollingEndpoint, apiKey).text)
-
 }
 
 suspend fun checkResult(pollingEndpoint: String, apiKey: String): PollingResponse {
-    val objectMapper = jacksonObjectMapper()
-    val pollingConnection = withContext(IO) {
-        URL(pollingEndpoint).openConnection()
-    } as HttpURLConnection
-    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    pollingConnection.requestMethod = "GET"
-    pollingConnection.setRequestProperty("Authorization", apiKey)
-    val pollingResponseText = pollingConnection.inputStream.bufferedReader().use { it.readText() }
-    val pollingResponse = objectMapper.readValue(pollingResponseText, PollingResponse::class.java)
+    val response: HttpResponse = TranscriptionService.client.get(pollingEndpoint) {
+        bearerAuth(apiKey)
+    }
+    val pollingResponse = TranscriptionService.objectMapper.readValue(
+        response.bodyAsText(),
+        object : TypeReference<PollingResponse>() {})
+
     when (getStatus(pollingResponse)) {
         TranscriptionTaskStatus.ERROR -> throw RuntimeException("Task was ended with error")
         TranscriptionTaskStatus.PROCESSING -> {
@@ -120,10 +109,8 @@ suspend fun getStatus(pollingResponse: PollingResponse): TranscriptionTaskStatus
 }
 
 fun main() {
-//    println(TranscriptionTaskStatus.valueOf("processing".toUpperCasePreservingASCIIRules()))
     val apiKey = "c4dcb2208a1c4c8088b4b7787f4f7cfe"
     val path = "Nice Talking with You.mp3"
-
     GlobalScope.launch {
         try {
             val uploadedFileUrl = uploadFile(path, apiKey)
@@ -133,7 +120,5 @@ fun main() {
             println(e.message)
         }
     }
-
-    // Keep the main thread alive to allow the coroutine to complete
     Thread.sleep(30000)
 }
