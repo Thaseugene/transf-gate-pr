@@ -9,9 +9,7 @@ import com.trans.kafka.JsonDeserializer
 import com.trans.kafka.JsonSerializer
 import com.trans.service.EventService
 import com.trans.service.mapping.toEventModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -25,7 +23,8 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 class KafkaService(
-    private val eventService: EventService
+    private val eventService: EventService,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(JsonSerializer::class.java)
@@ -34,33 +33,36 @@ class KafkaService(
     val producer: KafkaProducer<String, EventRecord> = createProducer()
 
     init {
-        launchKafkaConsumer(consumer, "test-event-topic")
+        CoroutineScope(dispatcher).launch {
+            launchKafkaConsumer(consumer, "test-event-topic")
+        }
     }
 
     fun sendMessage(eventRecord: EventRecord) {
         producer.send(ProducerRecord("test-event-topic", eventRecord))
     }
 
-    private fun launchKafkaConsumer(consumer: KafkaConsumer<String, EventRecord>, topic: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            consumer.subscribe(listOf(topic))
-            try {
-                while (true) {
-                    val records = consumer.poll(java.time.Duration.ofSeconds(1))
-                    for (record: ConsumerRecord<String, EventRecord> in records) {
-                        logger.info("Consumed message from topic ${record.topic()}: ${record.value()}")
-                        val executiveMap: Map<EventRecordExecuteType, (EventModel) -> EventResponse> = mapOf(
-                            EventRecordExecuteType.CREATE to { eventModel -> eventService.createEvent(eventModel) },
-                            EventRecordExecuteType.UPDATE to { eventModel -> eventService.updateEvent(eventModel) }
-                        )
-
-                        record.value()?.toEventModel()?.let { executiveMap.get(record.value().type)?.invoke(it) }
+    private suspend fun launchKafkaConsumer(consumer: KafkaConsumer<String, EventRecord>, topic: String) {
+        coroutineScope {
+            launch(dispatcher) {
+                consumer.subscribe(listOf(topic))
+                try {
+                    while (true) {
+                        val records = consumer.poll(java.time.Duration.ofSeconds(1))
+                        for (record: ConsumerRecord<String, EventRecord> in records) {
+                            logger.info("Consumed message from topic ${record.topic()}: ${record.value()}")
+                            val executiveMap: Map<EventRecordExecuteType, (EventModel) -> EventResponse> = mapOf(
+                                EventRecordExecuteType.CREATE to { eventModel -> eventService.createEvent(eventModel) },
+                                EventRecordExecuteType.UPDATE to { eventModel -> eventService.updateEvent(eventModel) }
+                            )
+                            record.value()?.toEventModel()?.let { executiveMap.get(record.value().type)?.invoke(it) }
+                        }
                     }
+                } catch (e: Exception) {
+                    logger.error("Error occurred while processing message from topic", e)
+                } finally {
+                    consumer.close()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                consumer.close()
             }
         }
     }

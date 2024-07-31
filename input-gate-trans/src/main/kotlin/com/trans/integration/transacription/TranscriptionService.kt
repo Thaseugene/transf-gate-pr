@@ -4,37 +4,30 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import com.trans.dto.PollingResponse
+import com.trans.dto.TranscriptRequest
+import com.trans.dto.TranscriptResponse
+import com.trans.dto.UploadResponse
+import com.trans.service.EventService
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.cio.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
 
-@Serializable
-data class UploadResponse(val upload_url: String)
+private const val UPLOAD_SERVICE_URL = "https://api.assemblyai.com/v2/upload"
+private const val TRANSCRIPT_URL = "https://api.assemblyai.com/v2/transcript"
+private const val RESULT_URL = "https://api.assemblyai.com/v2/transcript/%s"
 
-@Serializable
-data class TranscriptRequest(val audio_url: String)
+class TranscriptionService(
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val eventService: EventService
+) {
 
-@Serializable
-data class TranscriptResponse(val id: String)
-
-@Serializable
-data class PollingResponse(val status: String, val text: String? = null, val error: String? = null)
-
-class TranscriptionService() {
     companion object {
         val client = HttpClient(CIO) {
             install(Logging) {
@@ -46,23 +39,27 @@ class TranscriptionService() {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }
     }
+
+    suspend fun tryToMakeTranscript(recordId: String) {
+        val apiKey = System.getenv("apiKey") ?: "default_value"
+        val path = "Nice Talking with You.mp3"
+        val bytesToAnalyze = eventService.findEventById(recordId).value
+        uploadFile(path, apiKey, bytesToAnalyze);
+    }
+
 }
 
-private const val UPLOAD_SERVICE_URL = "https://api.assemblyai.com/v2/upload"
-private const val TRANSCRIPT_URL = "https://api.assemblyai.com/v2/transcript"
-private const val RESULT_URL = "https://api.assemblyai.com/v2/transcript/%s"
-
-suspend fun uploadFile(path: String, apiKey: String): String = withContext(IO) {
+suspend fun uploadFile(path: String, apiKey: String, bytesToAnalyze: ByteArray? = null): String = withContext(IO) {
     val file = File(path)
     val response: HttpResponse = TranscriptionService.client.post(UPLOAD_SERVICE_URL) {
         contentType(ContentType.Application.OctetStream)
         bearerAuth(apiKey)
-        setBody(file.readChannel())
+        setBody(bytesToAnalyze ?: file.readBytes())
     }
     val transcriptResponse = TranscriptionService.objectMapper.readValue(
         response.bodyAsText(),
         object : TypeReference<UploadResponse>() {})
-    transcriptResponse.upload_url
+    transcriptResponse.uploadUrl
 }
 
 suspend fun getTranscript(audioUrl: String, apiKey: String) = withContext(IO) {
@@ -88,29 +85,24 @@ suspend fun checkResult(pollingEndpoint: String, apiKey: String): PollingRespons
 
     when (getStatus(pollingResponse)) {
         TranscriptionTaskStatus.ERROR -> throw RuntimeException("Task was ended with error")
-        TranscriptionTaskStatus.PROCESSING -> {
+        TranscriptionTaskStatus.QUEUED, TranscriptionTaskStatus.PROCESSING -> {
             delay(3000L)
             return checkResult(pollingEndpoint, apiKey)
         }
-
-        TranscriptionTaskStatus.QUEUED -> {
-            delay(3000L)
-            return checkResult(pollingEndpoint, apiKey)
-        }
-
         TranscriptionTaskStatus.COMPLETED -> return pollingResponse
     }
     throw RuntimeException("Task ended without status")
 }
 
-suspend fun getStatus(pollingResponse: PollingResponse): TranscriptionTaskStatus {
+fun getStatus(pollingResponse: PollingResponse): TranscriptionTaskStatus {
     println(pollingResponse.status)
     return TranscriptionTaskStatus.valueOf(pollingResponse.status.uppercase())
 }
 
 fun main() {
-    val apiKey = "c4dcb2208a1c4c8088b4b7787f4f7cfe"
+    val apiKey = System.getenv("apiKey") ?: "default_value"
     val path = "Nice Talking with You.mp3"
+    println(apiKey)
     GlobalScope.launch {
         try {
             val uploadedFileUrl = uploadFile(path, apiKey)

@@ -1,7 +1,6 @@
 package com.trans.dependencyinjection
 
 import com.trans.api.EventController
-import com.trans.api.TestController
 import com.trans.persistanse.EventRepository
 import com.trans.persistanse.EventRepositoryImpl
 import com.trans.persistanse.TestRepository
@@ -9,7 +8,6 @@ import com.trans.persistanse.TestRepositoryImpl
 import com.trans.plugins.KafkaService
 import com.trans.service.EventService
 import com.trans.service.EventServiceImpl
-//import com.trans.service.StreamingService
 import com.trans.service.TestService
 import com.trans.service.TestServiceImpl
 import io.ktor.server.application.*
@@ -22,7 +20,7 @@ val gateModule = module {
     single<TestService> { TestServiceImpl(get()) }
     single<EventRepository> { EventRepositoryImpl() }
     single<EventService> { EventServiceImpl(get()) }
-    single<KafkaService> { KafkaService(get()) }
+    single<KafkaService> { KafkaService(get(), get()) }
     single<EventController> { EventController(get(), get()) }
 }
 
