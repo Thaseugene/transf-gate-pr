@@ -24,7 +24,6 @@ private const val TRANSCRIPT_URL = "https://api.assemblyai.com/v2/transcript"
 private const val RESULT_URL = "https://api.assemblyai.com/v2/transcript/%s"
 
 class TranscriptionService(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val eventService: EventService
 ) {
 
@@ -40,11 +39,20 @@ class TranscriptionService(
         }
     }
 
-    suspend fun tryToMakeTranscript(recordId: String) {
+    suspend fun tryToMakeTranscript(recordId: String) : String? {
+//        val apiKey = System.getenv("apiKey") ?: "default_value"
         val apiKey = System.getenv("apiKey") ?: "default_value"
         val path = "Nice Talking with You.mp3"
         val bytesToAnalyze = eventService.findEventById(recordId).value
         uploadFile(path, apiKey, bytesToAnalyze);
+        try {
+            val uploadedFileUrl = uploadFile(path, apiKey, bytesToAnalyze)
+            return getTranscript(uploadedFileUrl, apiKey)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println(e.message)
+        }
+        return null;
     }
 
 }
@@ -53,7 +61,7 @@ suspend fun uploadFile(path: String, apiKey: String, bytesToAnalyze: ByteArray? 
     val file = File(path)
     val response: HttpResponse = TranscriptionService.client.post(UPLOAD_SERVICE_URL) {
         contentType(ContentType.Application.OctetStream)
-        bearerAuth(apiKey)
+        header("Authorization", apiKey)
         setBody(bytesToAnalyze ?: file.readBytes())
     }
     val transcriptResponse = TranscriptionService.objectMapper.readValue(
@@ -65,14 +73,14 @@ suspend fun uploadFile(path: String, apiKey: String, bytesToAnalyze: ByteArray? 
 suspend fun getTranscript(audioUrl: String, apiKey: String) = withContext(IO) {
     val response: HttpResponse = TranscriptionService.client.post(TRANSCRIPT_URL) {
         contentType(ContentType.Application.Json)
-        bearerAuth(apiKey)
+        header("Authorization", apiKey)
         setBody(TranscriptionService.objectMapper.writeValueAsString(TranscriptRequest(audioUrl)))
     }
     val transcriptResponse = TranscriptionService.objectMapper.readValue(
         response.bodyAsText(),
         object : TypeReference<TranscriptResponse>() {})
     val pollingEndpoint = RESULT_URL.format(transcriptResponse.id)
-    println(checkResult(pollingEndpoint, apiKey).text)
+    checkResult(pollingEndpoint, apiKey).text
 }
 
 suspend fun checkResult(pollingEndpoint: String, apiKey: String): PollingResponse {
@@ -83,7 +91,7 @@ suspend fun checkResult(pollingEndpoint: String, apiKey: String): PollingRespons
         response.bodyAsText(),
         object : TypeReference<PollingResponse>() {})
 
-    when (getStatus(pollingResponse)) {
+    when (TranscriptionTaskStatus.valueOf(pollingResponse.status.uppercase())) {
         TranscriptionTaskStatus.ERROR -> throw RuntimeException("Task was ended with error")
         TranscriptionTaskStatus.QUEUED, TranscriptionTaskStatus.PROCESSING -> {
             delay(3000L)
@@ -92,11 +100,6 @@ suspend fun checkResult(pollingEndpoint: String, apiKey: String): PollingRespons
         TranscriptionTaskStatus.COMPLETED -> return pollingResponse
     }
     throw RuntimeException("Task ended without status")
-}
-
-fun getStatus(pollingResponse: PollingResponse): TranscriptionTaskStatus {
-    println(pollingResponse.status)
-    return TranscriptionTaskStatus.valueOf(pollingResponse.status.uppercase())
 }
 
 fun main() {

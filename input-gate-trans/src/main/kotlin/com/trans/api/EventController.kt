@@ -4,6 +4,7 @@ import com.trans.domain.EventRecordExecuteType
 import com.trans.dto.EventRequest
 import com.trans.plugins.KafkaService
 import com.trans.service.EventService
+import com.trans.service.mapping.toEventModel
 import com.trans.service.mapping.toEventRecord
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -25,19 +26,20 @@ class EventController(
 
     suspend fun deleteEventModel(call: ApplicationCall) {
         val request: EventRequest = call.receive()
-        kafkaService.sendMessage(request.toEventRecord(EventRecordExecuteType.DELETE))
+//        kafkaService.sendMessage(request.toEventRecord(EventRecordExecuteType.DELETE))
         call.respond(HttpStatusCode.OK)
     }
 
     suspend fun updateEventModel(call: ApplicationCall) {
         val request: EventRequest = call.receive()
-        kafkaService.sendMessage(request.toEventRecord(EventRecordExecuteType.UPDATE))
+//        kafkaService.sendMessage(request.toEventRecord(EventRecordExecuteType.UPDATE))
         call.respond(HttpStatusCode.OK)
     }
 
     suspend fun createEventModel(call: ApplicationCall) {
         val request: EventRequest = call.receive()
-        kafkaService.sendMessage(request.toEventRecord(EventRecordExecuteType.CREATE))
+        val existed = eventService.createEvent(request.toEventModel())
+        kafkaService.sendMessageToTranscription(existed.toEventRecord())
         call.respond(HttpStatusCode.OK)
     }
 

@@ -70,6 +70,29 @@ fun EventRequest.toEventRecord(eventType: EventRecordExecuteType) = EventRecord(
     eventType
 )
 
+fun EventRequest.toEventModel() = EventModel(
+    this.id,
+    this.clientId,
+    this.topicName,
+    UUID.randomUUID().toString(),
+    this.description,
+    this.timeStamp,
+    this.eventName,
+    this.value
+)
+
+fun EventResponse.toEventRecord(): EventRecord = EventRecord (
+    this.id,
+    this.clientId,
+    this.topicName,
+    UUID.randomUUID().toString(),
+    this.description,
+    this.timeStamp,
+    this.eventName,
+    byteArrayOf(),
+    EventRecordExecuteType.CREATE
+)
+
 fun EventRecord.toEventModel() = EventModel(
     this.id,
     this.clientId,

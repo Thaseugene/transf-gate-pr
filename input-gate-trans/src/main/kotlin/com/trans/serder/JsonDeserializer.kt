@@ -1,4 +1,4 @@
-package com.trans.kafka
+package com.trans.serder
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.type.TypeReference
