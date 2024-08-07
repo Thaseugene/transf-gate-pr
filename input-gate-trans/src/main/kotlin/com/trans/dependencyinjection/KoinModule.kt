@@ -1,6 +1,7 @@
 package com.trans.dependencyinjection
 
 import com.trans.api.EventController
+import com.trans.integration.tg.BotService
 import com.trans.integration.transacription.TranscriptionService
 import com.trans.persistanse.EventRepository
 import com.trans.persistanse.EventRepositoryImpl
@@ -26,6 +27,7 @@ val gateModule = module {
     single<TranscriptionService> { TranscriptionService(get()) }
     single<KafkaService> { KafkaService(get(), get()) }
     single<EventController> { EventController(get(), get()) }
+    single<BotService> { BotService(get()) }
 }
 
 fun Application.configureDependencies() {

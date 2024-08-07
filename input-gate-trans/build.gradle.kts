@@ -7,6 +7,7 @@ val ktorm_version: String by project
 val koin_Version: String by project
 val ktor_version: String by project
 val junit_version: String by project
+val telegram_bot_api_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -43,6 +44,9 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml")
+
+    //tg bot api
+    implementation("dev.inmo:tgbotapi:$telegram_bot_api_version")
 
     // exposed
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")

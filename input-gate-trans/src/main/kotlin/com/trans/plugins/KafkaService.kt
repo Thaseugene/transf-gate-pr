@@ -30,7 +30,7 @@ class KafkaService(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    private val logger: Logger = LoggerFactory.getLogger(JsonSerializer::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(KafkaService::class.java)
 
 //    val inputConsumer: KafkaConsumer<String, EventRecord> = createConsumer("test-group-id")
     val transcriptionConsumer: KafkaConsumer<String, EventRecord> = createConsumer("test-transcription-group-id")

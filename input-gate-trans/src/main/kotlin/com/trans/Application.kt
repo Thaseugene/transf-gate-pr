@@ -5,6 +5,7 @@ import com.trans.configuration.configureApplication
 import com.trans.configuration.configureDatabase
 import com.trans.configuration.invokeMigrationProcess
 import com.trans.dependencyinjection.configureDependencies
+import com.trans.integration.tg.configureBot
 import com.trans.plugins.*
 import io.ktor.server.application.*
 
@@ -21,4 +22,5 @@ fun Application.module() {
     configureSerialization()
 //    configureKafka(appConfiguration.kafkaConfig)
     configureRouting()
+    configureBot()
 }
