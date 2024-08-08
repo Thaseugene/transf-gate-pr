@@ -11,6 +11,7 @@ import com.trans.dto.UploadResponse
 import com.trans.service.EventService
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -90,7 +91,7 @@ suspend fun checkResult(pollingEndpoint: String, apiKey: String): PollingRespons
     val pollingResponse = TranscriptionService.objectMapper.readValue(
         response.bodyAsText(),
         object : TypeReference<PollingResponse>() {})
-
+    println("============${pollingResponse.status}=============")
     when (TranscriptionTaskStatus.valueOf(pollingResponse.status.uppercase())) {
         TranscriptionTaskStatus.ERROR -> throw RuntimeException("Task was ended with error")
         TranscriptionTaskStatus.QUEUED, TranscriptionTaskStatus.PROCESSING -> {

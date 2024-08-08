@@ -27,7 +27,7 @@ val gateModule = module {
     single<TranscriptionService> { TranscriptionService(get()) }
     single<KafkaService> { KafkaService(get(), get()) }
     single<EventController> { EventController(get(), get()) }
-    single<BotService> { BotService(get()) }
+    single<BotService> { BotService(get(), get(), get()) }
 }
 
 fun Application.configureDependencies() {

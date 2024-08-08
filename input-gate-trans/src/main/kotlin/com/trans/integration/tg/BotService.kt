@@ -6,7 +6,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.trans.domain.EventModel
+import com.trans.integration.transacription.TranscriptionService
 import com.trans.plugins.KafkaService
+import com.trans.service.EventService
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.files.downloadFile
 import dev.inmo.tgbotapi.extensions.api.files.downloadFileToTemp
@@ -31,6 +34,7 @@ import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.util.UUID
 
 fun Application.configureBot() {
 
@@ -43,7 +47,9 @@ fun Application.configureBot() {
 }
 
 class BotService(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val transcriptionService: TranscriptionService,
+    private val eventService: EventService
 ) {
 
     private val tgBot = telegramBot(System.getenv("botToken") ?: "default_value")
@@ -80,27 +86,26 @@ class BotService(
                     bot.downloadFile(content.media, outFile)
                 }.onFailure {
                     it.printStackTrace()
-                }.onSuccess { _ ->
+                }.onSuccess { action ->
+                    val event = eventService.createEvent(EventModel(
+                        1L,
+                        it.chat.id.chatId.toString(),
+                        "test",
+                        UUID.randomUUID().toString(),
+                        "test",
+                        System.currentTimeMillis(),
+                        "test event",
+                        outFile.readBytes()
+                    ))
                     withAction(it.chat.id, TypingAction) {
                         logger.info("Content type - $content")
                         when (content) {
-                            is MediaGroupContent<*> -> replyWithMediaGroup(
-                                it,
-                                content.group.map {
-                                    when (val innerContent = it.content) {
-                                        is AudioContent -> TelegramMediaAudio(
-                                            downloadFileToTemp(innerContent.media).asMultipartFile()
-                                        )
-                                        is DocumentContent -> TODO()
-                                        is PhotoContent -> TODO()
-                                        is VideoContent -> TODO()
-                                    }
+                            is VoiceContent, is AudioContent -> transcriptionService.tryToMakeTranscript(event.id.toString())
+                                ?.let { it1 ->
+                                    reply(it,
+                                        it1
+                                    )
                                 }
-                            )
-                            is VoiceContent, is AudioContent -> replyWithAudio(
-                                it,
-                                outFile.asMultipartFile()
-                            )
                             else  -> reply(
                                 it,
                                 "Incorrect file type, please download voice or audio file"
