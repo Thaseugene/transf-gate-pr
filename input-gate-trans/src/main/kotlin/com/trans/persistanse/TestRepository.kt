@@ -3,7 +3,7 @@ package com.trans.persistanse
 import com.trans.domain.Test
 import com.trans.exception.ExpCode
 import com.trans.exception.RepositoryException
-import com.trans.persistanse.entity.TestEntity
+import com.trans.persistanse.entity.UserEntity
 import com.trans.service.mapping.toTest
 import com.trans.service.mapping.updateFields
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -21,7 +21,7 @@ interface TestRepository {
 class TestRepositoryImpl : TestRepository {
 
     override fun save(test: Test): Test = transaction {
-        val createdEntity = TestEntity.new {
+        val createdEntity = UserEntity.new {
             name = test.name
             description = test.description
         }
@@ -46,9 +46,9 @@ class TestRepositoryImpl : TestRepository {
     }
 
     override fun findAll(): List<Test> = transaction {
-        TestEntity.all().map { it.toTest() }
+        UserEntity.all().map { it.toTest() }
     }
 
-    private fun findExistingById(id: Long): TestEntity? = TestEntity.findById(id)
+    private fun findExistingById(id: Long): UserEntity? = UserEntity.findById(id)
 
 }

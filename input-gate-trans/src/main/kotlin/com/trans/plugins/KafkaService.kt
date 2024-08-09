@@ -1,6 +1,6 @@
 package com.trans.plugins
 
-import com.trans.domain.EventModel
+import com.trans.domain.MessageModel
 import com.trans.domain.EventRecord
 import com.trans.domain.EventRecordExecuteType
 import com.trans.dto.EventResponse
@@ -48,7 +48,7 @@ class KafkaService(
                     val records = consumer.poll(java.time.Duration.ofSeconds(1))
                     for (record: ConsumerRecord<String, EventRecord> in records) {
                         logger.info("Consumed message from topic ${record.topic()}: ${record.value()}")
-                        val executiveMap: Map<EventRecordExecuteType, (EventModel) -> EventResponse> = mapOf(
+                        val executiveMap: Map<EventRecordExecuteType, (MessageModel) -> EventResponse> = mapOf(
                             EventRecordExecuteType.CREATE to { eventModel -> eventService.createEvent(eventModel) },
                             EventRecordExecuteType.UPDATE to { eventModel -> eventService.updateEvent(eventModel) }
                         )

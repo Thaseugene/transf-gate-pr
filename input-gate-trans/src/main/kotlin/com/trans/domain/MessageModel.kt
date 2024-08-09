@@ -1,5 +1,6 @@
 package com.trans.domain
 
+import com.trans.persistanse.entity.MessageStatus
 import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.time.LocalDateTime
@@ -8,15 +9,16 @@ import java.time.ZoneId
 const val DEFAULT_DATE_ZONE = "UTC"
 
 @Serializable
-data class EventModel(
+data class MessageModel(
     val id: Long,
-    val clientId: String,
-    val topicName: String,
+    val user: UserModel,
     val requestId: String,
-    val description: String,
+    val chatId: String,
+    val messageId: String,
     val timeStamp: Long,
-    val eventName: String,
-    val value: ByteArray? = null
+    val messageValue: ByteArray? = null,
+    val messageResult: ByteArray? = null,
+    val status: MessageStatus
 ) {
 
     val timeStampDate: LocalDateTime

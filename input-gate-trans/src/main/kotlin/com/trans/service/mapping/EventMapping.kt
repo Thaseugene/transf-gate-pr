@@ -1,31 +1,31 @@
 package com.trans.service.mapping
 
-import com.trans.domain.EventModel
+import com.trans.domain.MessageModel
 import com.trans.domain.EventRecord
 import com.trans.domain.EventRecordExecuteType
 import com.trans.dto.EventRequest
 import com.trans.dto.EventResponse
-import com.trans.persistanse.entity.EventEntity
+import com.trans.persistanse.entity.MessageEntity
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import java.time.ZoneId
 import java.util.UUID
 
-fun EventEntity.updateFields(eventModel: EventModel): EventModel {
-    this.clientId = eventModel.clientId
-    this.topicName = eventModel.topicName
-    this.requestId = eventModel.requestId
-    this.description = eventModel.description
-    this.timeStamp = eventModel.timeStampDate
-    this.eventName = eventModel.eventName
-    eventModel.value?.let {
+fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
+    this.clientId = messageModel.clientId
+    this.topicName = messageModel.topicName
+    this.requestId = messageModel.requestId
+    this.description = messageModel.description
+    this.timeStamp = messageModel.timeStampDate
+    this.eventName = messageModel.eventName
+    messageModel.value?.let {
         this.value = ExposedBlob(it)
     }
-    return eventModel.copy(
+    return messageModel.copy(
         id = this.id.value
     )
 }
 
-fun EventEntity.toEventModel(): EventModel = EventModel(
+fun MessageEntity.toEventModel(): MessageModel = MessageModel(
     this.id.value,
     this.clientId,
     this.topicName,
@@ -36,7 +36,7 @@ fun EventEntity.toEventModel(): EventModel = EventModel(
     this.value.bytes
 )
 
-fun EventResponse.toEventModel(): EventModel = EventModel (
+fun EventResponse.toEventModel(): MessageModel = MessageModel (
     this.id,
     this.clientId,
     this.topicName,
@@ -47,7 +47,7 @@ fun EventResponse.toEventModel(): EventModel = EventModel (
     this.value
 )
 
-fun EventModel.toEventDto() = EventResponse(
+fun MessageModel.toEventDto() = EventResponse(
     this.id,
     this.clientId,
     this.topicName,
@@ -70,7 +70,7 @@ fun EventRequest.toEventRecord(eventType: EventRecordExecuteType) = EventRecord(
     eventType
 )
 
-fun EventRecord.toEventModel() = EventModel(
+fun EventRecord.toEventModel() = MessageModel(
     this.id,
     this.clientId,
     this.topicName,

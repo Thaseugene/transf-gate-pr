@@ -1,9 +1,8 @@
 package com.trans.dependencyinjection
 
 import com.trans.api.EventController
-import com.trans.api.TestController
-import com.trans.persistanse.EventRepository
-import com.trans.persistanse.EventRepositoryImpl
+import com.trans.persistanse.MessageRepository
+import com.trans.persistanse.MessageRepositoryImpl
 import com.trans.persistanse.TestRepository
 import com.trans.persistanse.TestRepositoryImpl
 import com.trans.plugins.KafkaService
@@ -20,7 +19,7 @@ import org.koin.logger.SLF4JLogger
 val gateModule = module {
     single<TestRepository> { TestRepositoryImpl() }
     single<TestService> { TestServiceImpl(get()) }
-    single<EventRepository> { EventRepositoryImpl() }
+    single<MessageRepository> { MessageRepositoryImpl() }
     single<EventService> { EventServiceImpl(get()) }
     single<KafkaService> { KafkaService(get()) }
     single<EventController> { EventController(get(), get()) }

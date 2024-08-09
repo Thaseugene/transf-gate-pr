@@ -2,7 +2,7 @@ package com.trans.service.mapping
 
 import com.trans.domain.Test
 import com.trans.dto.TestDto
-import com.trans.persistanse.entity.TestEntity
+import com.trans.persistanse.entity.UserEntity
 
 fun TestDto.toTest(): Test = Test(
     this.id,
@@ -17,13 +17,13 @@ fun Test.toResponse(): TestDto = TestDto(
 )
 
 
-fun TestEntity.toTest() = Test(
+fun UserEntity.toTest() = Test(
     id = this.id.value,
     name = this.name,
     description = this.description
 )
 
-fun TestEntity.updateFields(test: Test): TestEntity {
+fun UserEntity.updateFields(test: Test): UserEntity {
     this.name = test.name
     this.description = test.description
     return this
