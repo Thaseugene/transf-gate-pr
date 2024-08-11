@@ -3,11 +3,10 @@ package com.trans.plugins
 import com.trans.domain.MessageModel
 import com.trans.domain.EventRecord
 import com.trans.domain.EventRecordExecuteType
-import com.trans.dto.EventResponse
 import com.trans.kafka.JsonDeserializer
 import com.trans.kafka.JsonSerializer
 import com.trans.service.EventService
-import com.trans.service.mapping.toEventModel
+import com.trans.service.mapping.toMessageModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -53,7 +52,7 @@ class KafkaService(
                             EventRecordExecuteType.UPDATE to { eventModel -> eventService.updateEvent(eventModel) }
                         )
 
-                        record.value()?.toEventModel()?.let { executiveMap.get(record.value().type)?.invoke(it) }
+                        record.value()?.toMessageModel()?.let { executiveMap.get(record.value().type)?.invoke(it) }
                     }
                 }
             } catch (e: Exception) {

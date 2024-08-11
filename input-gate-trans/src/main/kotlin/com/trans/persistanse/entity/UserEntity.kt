@@ -20,9 +20,9 @@ class UserEntity(id: EntityID<Long>): LongEntity(id) {
 
 object UserTable: LongIdTable("USERS", "ID") {
 
-    val userId = long("USER_ID")
-    val userName = varchar("USER_NAME", DEFAULT_VARCHAR_COLUMN_LENGTH)
-    val firstName = varchar("FIRST_NAME", DEFAULT_VARCHAR_COLUMN_LENGTH)
-    val lastName = varchar("LAST_NAME", DEFAULT_VARCHAR_COLUMN_LENGTH)
+    val userId = long(" USER_ID")
+    val userName = varchar("USER_NAME", DEFAULT_VARCHAR_COLUMN_LENGTH).nullable()
+    val firstName = varchar("FIRST_NAME", DEFAULT_VARCHAR_COLUMN_LENGTH).nullable()
+    val lastName = varchar("LAST_NAME", DEFAULT_VARCHAR_COLUMN_LENGTH).nullable()
 
 }

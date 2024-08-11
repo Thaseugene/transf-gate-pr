@@ -11,14 +11,14 @@ const val DEFAULT_DATE_ZONE = "UTC"
 @Serializable
 data class MessageModel(
     val id: Long,
-    val user: UserModel,
+    val user: Long,
     val requestId: String,
     val chatId: String,
     val messageId: String,
     val timeStamp: Long,
     val messageValue: ByteArray? = null,
     val messageResult: ByteArray? = null,
-    val status: MessageStatus
+    val status: MessageStatus? = null
 ) {
 
     val timeStampDate: LocalDateTime
