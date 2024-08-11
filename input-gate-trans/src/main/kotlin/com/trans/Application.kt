@@ -21,6 +21,5 @@ fun Application.module() {
     configureDependencies()
     configureSerialization()
 //    configureKafka(appConfiguration.kafkaConfig)
-    configureRouting()
     configureBot()
 }

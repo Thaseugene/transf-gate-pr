@@ -7,7 +7,7 @@ import io.ktor.server.testing.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ApplicationTest {
+class ApplicationUserModel {
     @Test
     fun testRoot() = testApplication {
         client.get("/").apply {
