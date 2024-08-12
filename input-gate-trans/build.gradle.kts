@@ -43,6 +43,7 @@ dependencies {
     implementation("io.ktor:ktor-server-resources-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-client-okhttp:$ktor_version")
     implementation("io.ktor:ktor-server-config-yaml")
 
     //tg bot api
@@ -57,6 +58,9 @@ dependencies {
 
     // h2
     implementation("com.h2database:h2:2.1.214")
+
+    //postgres
+    implementation("org.postgresql:postgresql:42.5.1")
 
     // liquibase
     implementation("org.liquibase:liquibase-core:4.15.0")

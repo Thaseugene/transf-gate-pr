@@ -6,7 +6,6 @@ import com.trans.exception.RepositoryException
 import com.trans.persistanse.entity.MessageEntity
 import com.trans.persistanse.entity.MessageTable
 import com.trans.service.mapping.toMessageModel
-import com.trans.service.mapping.toNewEntity
 import com.trans.service.mapping.updateFields
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ResultRow
@@ -17,9 +16,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 interface MessageRepository {
 
     fun save(messageModel: MessageModel): MessageModel
-    fun findByMessageId(messageId: String): MessageModel
-    fun findByChatId(chatId: String): List<MessageModel>
-    fun findByUserId(userId: String): List<MessageModel>
+    fun findByMessageId(messageId: Long): MessageModel
+    fun findByChatId(chatId: Long): List<MessageModel>
+    fun findByUserId(userId: Long): List<MessageModel>
     fun delete(id: Long)
     fun update(event: MessageModel): MessageModel
     fun findById(id: Long): MessageModel
@@ -30,13 +29,26 @@ interface MessageRepository {
 class MessageRepositoryImpl : MessageRepository {
 
     override fun save(messageModel: MessageModel): MessageModel = transaction {
-        val createdEntity = messageModel.toNewEntity()
+        val createdEntity = MessageEntity.new {
+            userId = messageModel.userId
+            requestId = messageModel.requestId
+            chatId = messageModel.chatId
+            messageId = messageModel.messageId
+            timestamp = messageModel.timeStampDate
+            messageModel.messageValue?.let {
+                messageValue = ExposedBlob(it)
+            }
+            messageModel.messageResult?.let {
+                messageResult = ExposedBlob(it)
+            }
+            status = messageModel.status
+        }
         messageModel.copy(
             id = createdEntity.id.value
         )
     }
 
-    override fun findByMessageId(messageId: String): MessageModel {
+    override fun findByMessageId(messageId: Long): MessageModel {
         val messageList = findBy(MessageTable.messageId, messageId)
         if (messageList.isEmpty()) {
             throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $messageId doesn't exists")
@@ -44,7 +56,7 @@ class MessageRepositoryImpl : MessageRepository {
         return messageList.first()?.toMessageModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $messageId doesn't exists")
     }
 
-    override fun findByChatId(chatId: String): List<MessageModel> {
+    override fun findByChatId(chatId: Long): List<MessageModel> {
         val messageList = findBy(MessageTable.chatId, chatId).filterNotNull().map { it.toMessageModel() }
         if (messageList.isEmpty()) {
             throw RepositoryException(ExpCode.NOT_FOUND, "Messages with chatId = $chatId doesn't exists")
@@ -52,8 +64,8 @@ class MessageRepositoryImpl : MessageRepository {
         return messageList
     }
 
-    override fun findByUserId(userId: String): List<MessageModel> {
-        val messageList = findBy(MessageTable.user, userId.toLong()).filterNotNull().map { it.toMessageModel() }
+    override fun findByUserId(userId: Long): List<MessageModel> {
+        val messageList = findBy(MessageTable.userId, userId).filterNotNull().map { it.toMessageModel() }
         if (messageList.isEmpty()) {
             throw RepositoryException(ExpCode.NOT_FOUND, "Messages with userId = $userId doesn't exists")
         }

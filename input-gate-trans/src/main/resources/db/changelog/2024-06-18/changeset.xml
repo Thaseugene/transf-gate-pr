@@ -13,16 +13,6 @@
         <sqlFile path="db/changelog/2024-06-18/feature-4-create-user-table.sql"/>
     </changeSet>
 
-    <changeSet id="feature-4-create-message-table" author="Budnichenka YS">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="MESSAGES"/>
-            </not>
-            <tableExists tableName="USERS"/>
-        </preConditions>
-        <sqlFile path="db/changelog/2024-06-18/feature-4-create-message-table.sql"/>
-    </changeSet>
-
     <changeSet id="feature-4-create-message_status-table" author="Budnichenka YS">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -38,4 +28,15 @@
         </preConditions>
         <sqlFile path="db/changelog/2024-06-18/feature-4-fill-message-status-table.sql"/>
     </changeSet>
+
+    <changeSet id="feature-4-create-message-table" author="Budnichenka YS">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="MESSAGES"/>
+            </not>
+            <tableExists tableName="USERS"/>
+        </preConditions>
+        <sqlFile path="db/changelog/2024-06-18/feature-4-create-message-table.sql"/>
+    </changeSet>
+
 </databaseChangeLog>

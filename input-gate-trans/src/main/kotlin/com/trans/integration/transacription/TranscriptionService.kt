@@ -8,30 +8,45 @@ import com.trans.dto.PollingResponse
 import com.trans.dto.TranscriptRequest
 import com.trans.dto.TranscriptResponse
 import com.trans.dto.UploadResponse
-import com.trans.service.EventService
+import com.trans.integration.transacription.TranscriptionService.Companion.client
+import com.trans.service.MessageService
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
+
 
 private const val UPLOAD_SERVICE_URL = "https://api.assemblyai.com/v2/upload"
 private const val TRANSCRIPT_URL = "https://api.assemblyai.com/v2/transcript"
 private const val RESULT_URL = "https://api.assemblyai.com/v2/transcript/%s"
 
 class TranscriptionService(
-    private val eventService: EventService
+    private val messageService: MessageService
 ) {
 
     companion object {
-        val client = HttpClient(CIO) {
+        val client = HttpClient(OkHttp) {
             install(Logging) {
-                level = LogLevel.INFO
+                level = LogLevel.ALL
+            }
+            engine {
+                proxy = ProxyBuilder.socks("148.113.162.23", 63309)
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 60000
+                socketTimeoutMillis = 60000
+                connectTimeoutMillis = 60000
             }
         }
 
@@ -40,11 +55,10 @@ class TranscriptionService(
         }
     }
 
-    suspend fun tryToMakeTranscript(recordId: String) : String? {
-//        val apiKey = System.getenv("apiKey") ?: "default_value"
+    suspend fun tryToMakeTranscript(recordId: Long): String? {
         val apiKey = System.getenv("apiKey") ?: "default_value"
-        val path = "Nice Talking with You.mp3"
-        val bytesToAnalyze = eventService.findEventById(recordId).value
+        val path = "Record (online-voice-recorder.com).mp3"
+        val bytesToAnalyze = messageService.findMessageById(recordId).messageValue
         uploadFile(path, apiKey, bytesToAnalyze);
         try {
             val uploadedFileUrl = uploadFile(path, apiKey, bytesToAnalyze)
@@ -75,7 +89,7 @@ suspend fun getTranscript(audioUrl: String, apiKey: String) = withContext(IO) {
     val response: HttpResponse = TranscriptionService.client.post(TRANSCRIPT_URL) {
         contentType(ContentType.Application.Json)
         header("Authorization", apiKey)
-        setBody(TranscriptionService.objectMapper.writeValueAsString(TranscriptRequest(audioUrl)))
+        setBody(TranscriptionService.objectMapper.writeValueAsString(TranscriptRequest(audioUrl, true)))
     }
     val transcriptResponse = TranscriptionService.objectMapper.readValue(
         response.bodyAsText(),
@@ -103,14 +117,37 @@ suspend fun checkResult(pollingEndpoint: String, apiKey: String): PollingRespons
     throw RuntimeException("Task ended without status")
 }
 
+suspend fun testGptCheck() {
+    val file = File("Record (online-voice-recorder.com).mp3")
+    println(client.engine.config.proxy?.address())
+    val response: HttpResponse = client.post("https://api.openai.com/v1/audio/transcriptions") {
+        header("Authorization", "Bearer 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")
+        setBody(
+            MultiPartFormDataContent(
+                formData {
+                    append("model", "whisper-1")
+                    append("file", file.readBytes(), Headers.build {
+                        append(HttpHeaders.ContentType, "audio/mpeg")
+                        append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
+                    })
+                }
+            )
+        )
+    }
+
+    println(response.bodyAsText())
+    client.close()
+}
+
 fun main() {
-    val apiKey = System.getenv("apiKey") ?: "default_value"
-    val path = "Nice Talking with You.mp3"
+    val apiKey = System.getenv("apiKey") ?: "3e1888b1c74b493c981866284e11003a"
+    val path = "Record (online-voice-recorder.com).mp3"
     println(apiKey)
     GlobalScope.launch {
         try {
+//            testGptCheck();
             val uploadedFileUrl = uploadFile(path, apiKey)
-            getTranscript(uploadedFileUrl, apiKey)
+            println(getTranscript(uploadedFileUrl, apiKey))
         } catch (e: Exception) {
             e.printStackTrace()
             println(e.message)

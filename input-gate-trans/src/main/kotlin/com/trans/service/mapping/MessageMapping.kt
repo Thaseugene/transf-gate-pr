@@ -1,14 +1,15 @@
 package com.trans.service.mapping
 
 import com.trans.domain.MessageModel
-import com.trans.domain.UserModel
 import com.trans.persistanse.entity.MessageEntity
-import com.trans.persistanse.entity.UserEntity
+import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
+import dev.inmo.tgbotapi.types.message.content.MediaContent
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import java.time.ZoneOffset
+import java.util.*
 
 fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
-    this.user = messageModel.user
+    this.userId = messageModel.userId
     this.requestId = messageModel.requestId
     this.chatId = messageModel.chatId
     this.messageId = messageModel.messageId
@@ -26,7 +27,7 @@ fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
 
 fun MessageEntity.toMessageModel(): MessageModel = MessageModel(
     this.id.value,
-    this.user,
+    this.userId,
     this.requestId,
     this.chatId,
     this.messageId,
@@ -39,7 +40,7 @@ fun MessageEntity.toMessageModel(): MessageModel = MessageModel(
 fun MessageModel.toNewEntity(): MessageEntity {
     val messageModel = this
     return MessageEntity.new {
-        user = messageModel.user
+        userId = messageModel.userId
         requestId = messageModel.requestId
         chatId = messageModel.chatId
         timestamp = messageModel.timeStampDate
@@ -52,3 +53,13 @@ fun MessageModel.toNewEntity(): MessageEntity {
         status = messageModel.status
     }
 }
+
+fun ContentMessage<MediaContent>.toMessageModel(userId: Long, outFile: ByteArray): MessageModel = MessageModel(
+    1L,
+    userId,
+    UUID.randomUUID().toString(),
+    this.chat.id.chatId.long,
+    this.messageId.long,
+    System.currentTimeMillis(),
+    outFile
+    )

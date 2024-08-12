@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 
 class MessageEntity(id: EntityID<Long>) : LongEntity(id) {
 
-    var user by MessageTable.user
+    var userId by MessageTable.userId
     var requestId by MessageTable.requestId
     var chatId by MessageTable.chatId
     var messageId by MessageTable.messageId
@@ -23,10 +23,10 @@ class MessageEntity(id: EntityID<Long>) : LongEntity(id) {
 
 object MessageTable : LongIdTable("MESSAGES", "ID") {
 
-    val user = reference("USER_ID", UserTable.userId)
+    val userId = reference("USER_ID", UserTable.userId)
     val requestId = varchar("REQUEST_ID", DEFAULT_VARCHAR_COLUMN_LENGTH)
-    val chatId = varchar("CHAT_ID", DEFAULT_VARCHAR_COLUMN_LENGTH)
-    val messageId = varchar("MESSAGE_ID", DEFAULT_VARCHAR_COLUMN_LENGTH)
+    val chatId = long("CHAT_ID")
+    val messageId = long("MESSAGE_ID")
     val timeStamp = datetime("TIMESTAMP")
     val messageValue = blob("MESSAGE_VALUE").nullable()
     val messageResult = blob("MESSAGE_RESULT").nullable()
