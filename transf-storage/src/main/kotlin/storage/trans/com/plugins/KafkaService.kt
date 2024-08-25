@@ -1,4 +1,4 @@
-//package com.trans.plugins
+package storage.trans.com.plugins
 //
 //import com.fasterxml.jackson.core.type.TypeReference
 //import com.trans.domain.EventModel
