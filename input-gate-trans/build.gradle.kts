@@ -60,7 +60,7 @@ dependencies {
     implementation("com.h2database:h2:2.1.214")
 
     //postgres
-    implementation("org.postgresql:postgresql:42.5.1")
+    implementation("org.postgresql:postgresql:42.7.2")
 
     // liquibase
     implementation("org.liquibase:liquibase-core:4.15.0")

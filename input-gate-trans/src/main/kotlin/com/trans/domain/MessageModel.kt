@@ -1,6 +1,5 @@
 package com.trans.domain
 
-import com.trans.persistanse.entity.MessageStatus
 import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.time.LocalDateTime

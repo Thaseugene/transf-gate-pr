@@ -58,7 +58,7 @@ class TranscriptionService(
     suspend fun tryToMakeTranscript(recordId: Long): String? {
         val apiKey = System.getenv("apiKey") ?: "default_value"
         val path = "Record (online-voice-recorder.com).mp3"
-        val bytesToAnalyze = messageService.findMessageById(recordId).messageValue
+        val bytesToAnalyze = null
         uploadFile(path, apiKey, bytesToAnalyze);
         try {
             val uploadedFileUrl = uploadFile(path, apiKey, bytesToAnalyze)

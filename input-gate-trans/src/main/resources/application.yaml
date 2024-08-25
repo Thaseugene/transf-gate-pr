@@ -5,19 +5,14 @@ ktor:
     deployment:
         port: 8095
 
-
-database:
-    driverClass: "org.postgresql.Driver"
-    url: "jdbc:postgresql://localhost:5432/testdb"
-    user: "admin"
-    password: "admin"
-    maxPoolSize: 10
-
 kafka:
-    registryUrl: "http://127.0.0.1:8081"
-    groupId: "test-group-id"
-    producerClientId: "producerTestClientId"
-    consumerClientId: "consumerTestClientId"
-    topicName: "test-event-topic"
     bootstrapServers:
-        - "http://127.0.0.1:29092"
+        - "http://localhost:9092"
+    producerTopics:
+        - name: "tg-incoming-storage"
+          senderType: "PROCESSING_SENDER"
+    consumerTopics:
+        - name: "tg-out-storage"
+          handler: "PROCESSING_HANDLER"
+          deserializerType: "com.trans.domain.ProcessingMessageResponse"
+

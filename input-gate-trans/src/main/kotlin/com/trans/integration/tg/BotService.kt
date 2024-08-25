@@ -12,6 +12,7 @@ import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
 import dev.inmo.tgbotapi.extensions.api.send.withAction
+import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMedia
@@ -21,10 +22,13 @@ import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.types.RawChatId
 import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.actions.TypingAction
+import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.AudioContent
+import dev.inmo.tgbotapi.types.message.content.MediaContent
 import dev.inmo.tgbotapi.types.message.content.VoiceContent
 import dev.inmo.tgbotapi.utils.filenameFromUrl
 import io.ktor.server.application.*
+import io.ktor.util.collections.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +37,7 @@ import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.util.UUID
 
 fun Application.configureBot() {
 
@@ -45,12 +50,12 @@ fun Application.configureBot() {
 }
 
 class BotService(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val transcriptionService: TranscriptionService,
     private val messageService: MessageService
 ) {
 
     private val tgBot = telegramBot(System.getenv("botToken") ?: "default_value")
+
+    private val downloadFilePath = "https://api.telegram.org/file/bot%s/%s"
 
     private val logger: Logger = LoggerFactory.getLogger(BotService::class.java)
 
@@ -59,7 +64,6 @@ class BotService(
     }
 
     companion object {
-
         val objectMapper: ObjectMapper = with(jacksonObjectMapper()) {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
@@ -68,52 +72,41 @@ class BotService(
 
     private suspend fun launchMessageListener() {
 
-        val directoryOrFile = File("/tmp/")
-        directoryOrFile.mkdirs()
         tgBot.buildBehaviourWithLongPolling {
             onCommand("start") {
                 println(objectMapper.writeValueAsString(it))
                 reply(it, "Please, send me some audio or voice message, and I'll make transcription =)")
             }
             onMedia(initialFilter = null) { commonMessage ->
-
-                logger.info(objectMapper.writeValueAsString(commonMessage))
-                val content = commonMessage.content
-                val pathedFile = bot.getFileAdditionalInfo(content.media)
-                try {
-                } catch (e: Exception) {
-                    logger.error("Problem", e)
-                    bot.reply(commonMessage, "Error while trying to get file from chat, please try later...")
-                    return@onMedia
-                }
-                logger.info("Full file path for this file -> ${pathedFile.filePath}")
-                val outFile = File(directoryOrFile, pathedFile.filePath.filenameFromUrl)
-                runCatching {
-                    bot.downloadFile(content.media, outFile)
-                }.onFailure {
-                    logger.error("Error while trying to get file from chat", it)
-                    reply(commonMessage, "Error while trying to get file from chat, please try later...")
-                }.onSuccess { _ ->
-                    val message = messageService.processIncomingMessage(commonMessage, outFile.readBytes())
-                    withAction(commonMessage.chat.id, TypingAction) {
-                        logger.info("Content type - $content")
-                        when (content) {
-                            is VoiceContent, is AudioContent -> message?.id?.let { messageId ->
-                                transcriptionService.tryToMakeTranscript(messageId)
-                                    ?.let { sendAnswer(it, message.chatId, message.messageId) }
-                            }
-                            else  -> reply(
-                                commonMessage,
-                                "Incorrect file type, please download voice or audio file"
-                            )
-                        }
-                    }
-                }
+                processMediaInput(commonMessage)
             }
             onText {
                 reply(it, "Please, send me some audio or voice message, and I'll make transcription =)")
             }
         }.join()
+    }
+
+    private suspend fun BehaviourContext.processMediaInput(commonMessage: CommonMessage<MediaContent>) {
+        logger.info("Received new bot message -> ${objectMapper.writeValueAsString(commonMessage)}")
+        try {
+            withAction(commonMessage.chat.id, TypingAction) {
+                when (commonMessage.content) {
+                    is VoiceContent, is AudioContent -> {
+                        val pathFile = bot.getFileAdditionalInfo(commonMessage.content.media)
+                        val preparedFilePath: String =
+                            downloadFilePath.format(System.getenv("botToken"), pathFile.filePath)
+                        messageService.processTelegramMessage(commonMessage, preparedFilePath)
+                    }
+                    else -> reply(
+                        commonMessage,
+                        "Incorrect file type, please download voice or audio file"
+                    )
+                }
+            }
+        } catch (ex: Exception) {
+            reply(commonMessage, "Something went wrong, please try later...")
+        }
+
     }
 
 
