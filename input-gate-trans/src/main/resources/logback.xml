@@ -4,10 +4,18 @@
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="trace">
+
+    <!-- Настройка корневого логгера -->
+    <root level="ALL">
         <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="org.eclipse.jetty" level="INFO"/>
-    <logger name="io.netty" level="INFO"/>
-    <logger name="kafka" level="OFF"/>
+
+    <!-- Примеры настройки логгеров для различных библиотек -->
+    <logger name="io.ktor" level="ALL"/>
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="org.jetbrains.exposed" level="ALL"/>
+    <logger name="io.insert-koin" level="ALL"/>
+    <logger name="dev.inmo.tgbotapi" level="INFO"/>
+
+    <!-- При необходимости можно добавить логгеры для других компонентов -->
 </configuration>

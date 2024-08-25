@@ -7,6 +7,7 @@ val ktorm_version: String by project
 val koin_Version: String by project
 val ktor_version: String by project
 val junit_version: String by project
+val telegram_bot_api_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -30,17 +31,23 @@ repositories {
 
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
+    implementation("io.ktor:ktor-client-core-jvm")
+    implementation("io.ktor:ktor-client-cio-jvm")
+    implementation("io.ktor:ktor-client-logging-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
-//    implementation("io.github.flaxoos:ktor-server-kafka-jvm:1.2.9")
-    implementation("org.apache.kafka:kafka-clients:3.1.0")
+    implementation("org.apache.kafka:kafka-clients:3.4.0")
     implementation("io.ktor:ktor-serialization-jackson-jvm")
     implementation("io.ktor:ktor-server-host-common-jvm")
     implementation("io.ktor:ktor-server-status-pages-jvm")
     implementation("io.ktor:ktor-server-resources-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-client-okhttp:$ktor_version")
     implementation("io.ktor:ktor-server-config-yaml")
+
+    //tg bot api
+    implementation("dev.inmo:tgbotapi:$telegram_bot_api_version")
 
     // exposed
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
@@ -51,6 +58,9 @@ dependencies {
 
     // h2
     implementation("com.h2database:h2:2.1.214")
+
+    //postgres
+    implementation("org.postgresql:postgresql:42.5.1")
 
     // liquibase
     implementation("org.liquibase:liquibase-core:4.15.0")

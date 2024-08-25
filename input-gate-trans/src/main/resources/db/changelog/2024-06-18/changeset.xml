@@ -4,12 +4,39 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="0001-create-Event-table.sql" author="Budnichenka YS">
+    <changeSet id="feature-4-create-user-table" author="Budnichenka YS">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="EVENT"/>
+                <tableExists tableName="USERS"/>
             </not>
         </preConditions>
-        <sqlFile path="db/changelog/2024-06-18/0001-create-Event-table.sql" />
+        <sqlFile path="db/changelog/2024-06-18/feature-4-create-user-table.sql"/>
     </changeSet>
+
+    <changeSet id="feature-4-create-message_status-table" author="Budnichenka YS">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="MESSAGE_STATUS"/>
+            </not>
+        </preConditions>
+        <sqlFile path="db/changelog/2024-06-18/feature-4-create-message_status-table.sql"/>
+    </changeSet>
+
+    <changeSet id="feature-4-fill-message-status-table" author="Budnichenka YS">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="MESSAGE_STATUS"/>
+        </preConditions>
+        <sqlFile path="db/changelog/2024-06-18/feature-4-fill-message-status-table.sql"/>
+    </changeSet>
+
+    <changeSet id="feature-4-create-message-table" author="Budnichenka YS">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="MESSAGES"/>
+            </not>
+            <tableExists tableName="USERS"/>
+        </preConditions>
+        <sqlFile path="db/changelog/2024-06-18/feature-4-create-message-table.sql"/>
+    </changeSet>
+
 </databaseChangeLog>

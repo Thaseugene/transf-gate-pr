@@ -7,10 +7,10 @@ ktor:
 
 
 database:
-    driverClass: "org.h2.Driver"
-    url: "jdbc:h2:mem:testdb"
-    user: "root"
-    password: "password"
+    driverClass: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:5432/testdb"
+    user: "admin"
+    password: "admin"
     maxPoolSize: 10
 
 kafka:
