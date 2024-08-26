@@ -19,6 +19,7 @@ interface MessageRepository {
     fun findByMessageId(messageId: Long): MessageModel
     fun findByChatId(chatId: Long): List<MessageModel>
     fun findByUserId(userId: Long): List<MessageModel>
+    fun findByRequestId(requestId: String): MessageModel
     fun delete(id: Long)
     fun update(messageModel: MessageModel): MessageModel
     fun findById(id: Long): MessageModel
@@ -35,9 +36,7 @@ class MessageRepositoryImpl : MessageRepository {
             chatId = messageModel.chatId
             messageId = messageModel.messageId
             timestamp = messageModel.timeStampDate
-            messageModel.messageValue?.let {
-                messageValue = ExposedBlob(it)
-            }
+            messageValue = messageModel.messageValue
             messageModel.messageResult?.let {
                 messageResult = ExposedBlob(it)
             }
@@ -70,6 +69,14 @@ class MessageRepositoryImpl : MessageRepository {
             throw RepositoryException(ExpCode.NOT_FOUND, "Messages with userId = $userId doesn't exists")
         }
         return messageList
+    }
+
+    override fun findByRequestId(requestId: String): MessageModel {
+        val messageList = findBy(MessageTable.requestId, requestId)
+        if (messageList.isEmpty()) {
+            throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $requestId doesn't exists")
+        }
+        return messageList.first()?.toMessageModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $requestId doesn't exists")
     }
 
     override fun delete(id: Long) {

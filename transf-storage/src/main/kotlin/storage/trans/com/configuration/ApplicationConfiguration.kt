@@ -22,12 +22,9 @@ fun Application.configureApplication(): ApplicationConfiguration {
     val kafkaConfigObject = environment.config.config("kafka")
     val registryUrl = kafkaConfigObject.property("registryUrl").getString()
     val bootstrapServers = kafkaConfigObject.property("bootstrapServers").getList()
-    val groupId = kafkaConfigObject.property("groupId").getString()
-    val producerClientId = kafkaConfigObject.property("producerClientId").getString()
-    val consumerClientId =  kafkaConfigObject.property("consumerClientId").getString()
-    val topicName =  kafkaConfigObject.property("topicName").getString()
+    val topicNames =  kafkaConfigObject.property("topics").getList()
 
-    appConfig.kafkaConfig = KafkaInnerConfig(registryUrl, bootstrapServers, groupId, producerClientId, consumerClientId, topicName)
+    appConfig.kafkaConfig = KafkaInnerConfig(registryUrl, bootstrapServers, topicNames)
     appConfig.databaseConfig = DatabaseConfig(driverClass, url, user, password, maxPoolSize)
     return appConfig
 }
@@ -43,8 +40,5 @@ data class DatabaseConfig(
 data class KafkaInnerConfig(
     val registryUrl: String,
     val bootstrapServers: List<String>,
-    val groupId: String,
-    val producerClientId: String,
-    val consumerClientId: String,
-    val topicName: String
+    val topicNames: List<String>
 )

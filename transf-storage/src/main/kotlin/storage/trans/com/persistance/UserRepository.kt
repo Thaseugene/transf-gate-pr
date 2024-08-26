@@ -20,6 +20,7 @@ interface UserRepository {
     fun findById(id: Long): UserModel
     fun findByUserId(userId: Long): UserModel
     fun findAll(): List<UserModel>
+    fun checkIsUserPresented(userId: Long): Boolean
 
 }
 
@@ -57,6 +58,10 @@ class UserRepositoryImpl : UserRepository {
 
     override fun findAll(): List<UserModel> = transaction {
         UserEntity.all().map { it.toUserModel() }
+    }
+
+    override fun checkIsUserPresented(userId: Long): Boolean {
+        return findBy(UserTable.userId, userId).filterNotNull().map { it.toUserModel() }.isEmpty()
     }
 
     override fun findByUserId(userId: Long): UserModel = transaction {

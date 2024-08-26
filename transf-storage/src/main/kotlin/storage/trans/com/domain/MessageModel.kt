@@ -16,9 +16,9 @@ data class MessageModel(
     val chatId: Long,
     val messageId: Long,
     val timeStamp: Long,
-    val messageValue: ByteArray? = null,
-    val messageResult: ByteArray? = null,
-    val status: MessageStatus? = null
+    val messageValue: String? = null,
+    var messageResult: ByteArray? = null,
+    var status: MessageStatus? = null
 ) {
 
     val timeStampDate: LocalDateTime

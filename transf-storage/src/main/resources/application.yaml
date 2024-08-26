@@ -15,9 +15,11 @@ database:
 
 kafka:
   registryUrl: "http://127.0.0.1:8081"
-  groupId: "test-group-id"
-  producerClientId: "producerTestClientId"
-  consumerClientId: "consumerTestClientId"
-  topicName: "test-event-topic"
   bootstrapServers:
     - "http://127.0.0.1:29092"
+  topics:
+      - "transcript-incoming-storage"
+      - "tg-incoming-storage"
+      - "transcript-out-storage"
+      - "tg-out-storage"
+
