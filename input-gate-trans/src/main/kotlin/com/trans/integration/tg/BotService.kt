@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.trans.integration.transacription.TranscriptionService
 import com.trans.service.MessageService
+import com.trans.service.MessageServiceImpl
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
-import dev.inmo.tgbotapi.extensions.api.files.downloadFile
 import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
@@ -26,18 +25,14 @@ import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.AudioContent
 import dev.inmo.tgbotapi.types.message.content.MediaContent
 import dev.inmo.tgbotapi.types.message.content.VoiceContent
-import dev.inmo.tgbotapi.utils.filenameFromUrl
 import io.ktor.server.application.*
-import io.ktor.util.collections.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.util.UUID
 
 fun Application.configureBot() {
 
@@ -49,11 +44,11 @@ fun Application.configureBot() {
     }
 }
 
-class BotService(
-    private val messageService: MessageService
-) {
+class BotService {
 
-    private val tgBot = telegramBot(System.getenv("botToken") ?: "default_value")
+    private val messageService by inject<MessageService>(MessageServiceImpl::class.java)
+
+    private val tgBot = telegramBot(System.getenv("botToken"))
 
     private val downloadFilePath = "https://api.telegram.org/file/bot%s/%s"
 
@@ -71,7 +66,6 @@ class BotService(
     }
 
     private suspend fun launchMessageListener() {
-
         tgBot.buildBehaviourWithLongPolling {
             onCommand("start") {
                 println(objectMapper.writeValueAsString(it))
@@ -109,10 +103,9 @@ class BotService(
 
     }
 
-
     suspend fun sendAnswer(answer: String, chatId: Long, messageId: Long) {
-        val chat = ChatId(RawChatId(chatId))
-        val replyParams = ReplyParameters(chat, MessageId(messageId))
-        tgBot.sendTextMessage(chat, answer, replyParameters = replyParams)
+        val replyParams = ReplyParameters(ChatId(RawChatId(chatId)), MessageId(messageId))
+        tgBot.sendTextMessage(replyParams.chatIdentifier, answer, replyParameters = replyParams)
     }
+
 }

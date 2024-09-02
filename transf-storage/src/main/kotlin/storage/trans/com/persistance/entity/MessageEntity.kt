@@ -28,7 +28,7 @@ object MessageTable : LongIdTable("MESSAGES", "ID") {
     val chatId = long("CHAT_ID")
     val messageId = long("MESSAGE_ID")
     val timeStamp = datetime("TIMESTAMP")
-    val messageValue = varchar("MESSAGE_VALUE", DEFAULT_VARCHAR_COLUMN_LENGTH)
+    val messageValue = blob("MESSAGE_VALUE")
     val messageResult = blob("MESSAGE_RESULT").nullable()
     val status = enumeration("STATUS", MessageStatus::class).nullable()
 

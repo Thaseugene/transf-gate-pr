@@ -16,6 +16,7 @@ import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
+import org.koin.java.KoinJavaComponent.inject
 import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -35,8 +36,8 @@ fun Application.configureMessaging(kafkaConfig: KafkaInnerConfig) {
 @Suppress("UNCHECKED_CAST")
 class MessagingProvider(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val handlerProvider: Lazy<HandlerProvider>
 ) {
+    private val handlerProvider by inject<HandlerProvider>(HandlerProvider::class.java)
     private val logger: Logger = LoggerFactory.getLogger(MessagingProvider::class.java)
     private lateinit var producer: KafkaProducer<String, Any>
     private var senderTypes = mutableMapOf<SenderType, String>()
@@ -78,7 +79,7 @@ class MessagingProvider(
                 val records = consumer.poll(java.time.Duration.ofSeconds(1))
                 for (record: ConsumerRecord<String, T> in records) {
                     logger.info("Consumed message from topic ${record.topic()}")
-                    handlerProvider.value.retrieveHandler(enumValueOf(handlerName))?.let {
+                    handlerProvider.retrieveHandler(enumValueOf(handlerName))?.let {
                         (it as MessageHandler<T>).handleMessage(record)
                     }
                 }

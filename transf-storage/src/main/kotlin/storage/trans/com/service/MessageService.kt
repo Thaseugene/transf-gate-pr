@@ -51,9 +51,7 @@ class MessageServiceImpl(
             val updatedMessage = messageRepository.update(
                 messageRepository.findByRequestId(incomingMessage.requestId)
                     .updateTranscriptFields(incomingMessage))
-            val result = incomingMessage.messageResult?.let {
-                String(it)
-            } ?: ""
+            val result = incomingMessage.messageResult
             messagingProvider.prepareMessageToSend(
                 updatedMessage.toTelegramResponse(result),
                 SenderType.TELEGRAM_SENDER)

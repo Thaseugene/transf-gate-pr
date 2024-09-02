@@ -13,8 +13,9 @@ import storage.trans.com.messaging.HandlerType
 
 class HandlerProvider(
     private val dispatcher: CoroutineDispatcher,
-    private val botService: Lazy<BotService>
 ) {
+    private val botService by inject<BotService>(BotService::class.java)
+
     private val handlers = mutableMapOf<HandlerType, Any>()
 
     companion object {
@@ -25,7 +26,7 @@ class HandlerProvider(
     }
 
     init {
-        val telegramMessageHandler = ProcessingMessageHandler(botService.value, dispatcher)
+        val telegramMessageHandler = ProcessingMessageHandler(botService, dispatcher)
 
         handlers[telegramMessageHandler.getType()] = telegramMessageHandler
     }

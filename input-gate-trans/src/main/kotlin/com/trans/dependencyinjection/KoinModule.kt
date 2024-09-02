@@ -13,10 +13,10 @@ import storage.trans.com.messaging.MessagingProvider
 
 val TG_SERVICE_MODULE = module {
     single { Dispatchers.IO }
-    single { BotService(get()) }
-    single { MessageServiceImpl(get()) as MessageService }
-    single { MessagingProvider(get(), lazy { get() }) }
-    single { HandlerProvider(get(), lazy { get() }) }
+    single { BotService() }
+    single { MessageServiceImpl() }
+    single { MessagingProvider(get()) }
+    single { HandlerProvider(get()) }
 }
 
 fun Application.configureDependencies() {

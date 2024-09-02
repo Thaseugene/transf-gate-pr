@@ -1,4 +1,4 @@
-package com.trans.integration.transacription
+package com.trans.transcript.integration.transacription
 
 enum class TranscriptionTaskStatus {
 

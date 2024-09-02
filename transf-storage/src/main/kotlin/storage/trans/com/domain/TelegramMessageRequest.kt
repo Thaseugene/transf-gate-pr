@@ -10,7 +10,7 @@ data class TelegramMessageRequest(
     val chatId: Long,
     val messageId: Long,
     val timeStamp: Long,
-    val messageValue: String,
+    val messageValue: ByteArray,
     val messageResult: ByteArray? = null,
     val status: MessageStatus? = null,
     val userName: String? = null,

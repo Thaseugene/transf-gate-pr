@@ -9,7 +9,7 @@ import storage.trans.com.messaging.configureMessaging
 import storage.trans.com.plugins.configureSerialization
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    io.ktor.server.cio.EngineMain.main(args)
 }
 
 fun Application.module() {

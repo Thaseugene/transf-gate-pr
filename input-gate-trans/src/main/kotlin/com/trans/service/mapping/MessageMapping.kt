@@ -1,6 +1,5 @@
 package com.trans.service.mapping
 
-import com.trans.domain.MessageModel
 import com.trans.domain.MessageStatus
 import com.trans.domain.ProcessingMessageRequest
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
@@ -16,7 +15,7 @@ fun ContentMessage<MediaContent>.toProcessingMessage(messageValue: String): Proc
         this.chat.id.chatId.long,
         this.messageId.long,
         System.currentTimeMillis(),
-        messageValue,
+        Base64.getEncoder().encode(messageValue.encodeToByteArray()),
         status = MessageStatus.NEW,
         userName = this.from?.username?.full,
         firstName = this.from?.firstName,

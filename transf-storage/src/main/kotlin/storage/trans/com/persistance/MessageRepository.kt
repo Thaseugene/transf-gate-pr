@@ -36,7 +36,7 @@ class MessageRepositoryImpl : MessageRepository {
             chatId = messageModel.chatId
             messageId = messageModel.messageId
             timestamp = messageModel.timeStampDate
-            messageValue = messageModel.messageValue
+            messageValue = ExposedBlob(messageModel.messageValue)
             messageModel.messageResult?.let {
                 messageResult = ExposedBlob(it)
             }

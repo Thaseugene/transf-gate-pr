@@ -1,4 +1,4 @@
-package com.trans.dto
+package com.trans.transcript.dto
 
 data class Error(
     val errorCode: Int,

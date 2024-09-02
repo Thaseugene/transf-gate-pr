@@ -1,10 +1,13 @@
 package com.trans.service.mapping
 
+import io.ktor.utils.io.core.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import storage.trans.com.domain.*
 import storage.trans.com.persistance.entity.MessageEntity
 import storage.trans.com.persistance.entity.MessageStatus
 import java.time.ZoneOffset
+import java.util.*
+import kotlin.text.toByteArray
 
 fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
     this.userId = messageModel.userId
@@ -12,7 +15,7 @@ fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
     this.chatId = messageModel.chatId
     this.messageId = messageModel.messageId
     this.timestamp = messageModel.timeStampDate
-    this.messageValue = messageModel.messageValue
+    this.messageValue = ExposedBlob(messageModel.messageValue)
     messageModel.messageResult?.let {
         this.messageResult = ExposedBlob(it)
     }
@@ -28,7 +31,7 @@ fun MessageEntity.toMessageModel() = MessageModel(
     this.chatId,
     this.messageId,
     this.timestamp.toEpochSecond(ZoneOffset.UTC),
-    this.messageValue,
+    this.messageValue.bytes,
     this.messageResult?.bytes,
     this.status
 )
@@ -40,7 +43,7 @@ fun MessageModel.toNewEntity(): MessageEntity {
         requestId = messageModel.requestId
         chatId = messageModel.chatId
         timestamp = messageModel.timeStampDate
-        messageValue = messageModel.messageValue
+        messageValue = ExposedBlob(messageModel.messageValue)
         messageModel.messageResult?.let {
             messageResult = ExposedBlob(it)
         }
@@ -49,7 +52,7 @@ fun MessageModel.toNewEntity(): MessageEntity {
 }
 
 fun MessageModel.updateTranscriptFields(incomingMessage: TranscriptMessageRequest): MessageModel {
-    this.messageResult = incomingMessage.messageResult
+    this.messageResult = Base64.getEncoder().encode(incomingMessage.messageResult.toByteArray())
     this.status = incomingMessage.status
     return this
 }
