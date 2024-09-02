@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory
 import com.trans.transcript.messaging.HandlerType
 import com.trans.transcript.messaging.SenderType
 import com.trans.transcript.service.mapping.prepareProcessingResponse
+import io.ktor.client.engine.*
 import java.util.*
 
 class ProcessingMessageHandler(
@@ -29,7 +30,7 @@ class ProcessingMessageHandler(
 
     private val logger: Logger = LoggerFactory.getLogger(ProcessingMessageHandler::class.java)
 
-    private val empty = ""
+    private val empty = "ERROR"
 
     companion object {
         val client = HttpClient(OkHttp) {
@@ -49,8 +50,8 @@ class ProcessingMessageHandler(
             message.value()?.let {
                 logger.info("Message -> ${message.value()}")
                 try {
-                    val downloadUrl = Base64.getUrlDecoder().decode(message.value().downloadUrl).contentToString()
-                    val response: HttpResponse = client.post(downloadUrl)
+                    val downloadUrl = Base64.getDecoder().decode(message.value().downloadUrl).decodeToString()
+                    val response: HttpResponse = client.get(downloadUrl)
                     val result = transcriptionService.tryToMakeTranscript(response.readBytes())
                     messagingProvider.prepareMessageToSend(
                         prepareProcessingResponse(
