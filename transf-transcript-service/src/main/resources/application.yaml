@@ -6,6 +6,7 @@ ktor:
     port: 8095
 
 kafka:
+  groupId: "transcript-service-group"
   bootstrapServers:
     - "http://localhost:9092"
   producerTopics:

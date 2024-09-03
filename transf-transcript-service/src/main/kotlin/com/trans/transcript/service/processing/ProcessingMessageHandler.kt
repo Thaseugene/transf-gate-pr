@@ -54,6 +54,7 @@ class ProcessingMessageHandler(
                     val response: HttpResponse = client.get(downloadUrl)
                     val result = transcriptionService.tryToMakeTranscript(response.readBytes())
                     messagingProvider.prepareMessageToSend(
+                        message.value().requestId,
                         prepareProcessingResponse(
                             message.value().requestId,
                             if (result.isNullOrEmpty()) MessageStatus.ERROR else MessageStatus.OK,
@@ -74,6 +75,7 @@ class ProcessingMessageHandler(
 
     private fun sendErrorMessage(requestId: String) {
         messagingProvider.prepareMessageToSend(
+            requestId,
             prepareProcessingResponse(requestId, MessageStatus.ERROR, empty),
             SenderType.PROCESSING_SENDER
         )

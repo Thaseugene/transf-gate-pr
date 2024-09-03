@@ -21,6 +21,7 @@ fun Application.configureApplication(): ApplicationConfiguration {
     //kafka config import
     val kafkaConfigObject = environment.config.config("kafka")
     val bootstrapServers = kafkaConfigObject.property("bootstrapServers").getList()
+    val groupId = kafkaConfigObject.property("groupId").getString()
     val producerTopics =  kafkaConfigObject.configList("producerTopics").associate {
         val producerInnerConfig = ProducerInnerConfig(
             it.property("name").getString(),
@@ -37,7 +38,7 @@ fun Application.configureApplication(): ApplicationConfiguration {
         consumerInnerConfig.topicName to consumerInnerConfig
     }
 
-    appConfig.kafkaConfig = KafkaInnerConfig(bootstrapServers, consumerTopics, producerTopics)
+    appConfig.kafkaConfig = KafkaInnerConfig(groupId, bootstrapServers, consumerTopics, producerTopics)
     appConfig.databaseConfig = DatabaseConfig(driverClass, url, user, password, maxPoolSize)
     return appConfig
 }
@@ -51,6 +52,7 @@ data class DatabaseConfig(
 )
 
 data class KafkaInnerConfig(
+    val groupId: String,
     val bootstrapServers: List<String>,
     val consumerConfig: Map<String, ConsumerInnerConfig>,
     val producerTopics: Map<String, ProducerInnerConfig>

@@ -6,7 +6,6 @@ import storage.trans.com.configuration.configureApplication
 import storage.trans.com.configuration.configureDatabase
 import storage.trans.com.configuration.invokeMigrationProcess
 import storage.trans.com.messaging.configureMessaging
-import storage.trans.com.plugins.configureSerialization
 
 fun main(args: Array<String>) {
     io.ktor.server.cio.EngineMain.main(args)
@@ -19,7 +18,7 @@ fun Application.module() {
     invokeMigrationProcess(configureDatabase(appConfiguration))
     configureDependencies()
     configureMessaging(appConfiguration.kafkaConfig)
-    configureSerialization()
+//    configureSerialization()
 
 
 }

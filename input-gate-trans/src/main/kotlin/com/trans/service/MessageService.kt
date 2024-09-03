@@ -6,7 +6,7 @@ import dev.inmo.tgbotapi.types.message.content.MediaContent
 import org.koin.java.KoinJavaComponent.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import storage.trans.com.messaging.MessagingProvider
+import com.trans.messaging.MessagingProvider
 import storage.trans.com.messaging.SenderType
 
 interface MessageService {
@@ -15,9 +15,7 @@ interface MessageService {
 
 }
 
-class MessageServiceImpl(
-
-) : MessageService {
+class MessageServiceImpl : MessageService {
 
     private val messagingProvider by inject<MessagingProvider>(MessagingProvider::class.java)
 
@@ -28,12 +26,13 @@ class MessageServiceImpl(
         downloadFilePath: String
     ) {
         logger.info("Preparing incoming message from user -> ${incomingMessage.chat.id.chatId.long}")
+        val processedMessage = incomingMessage.toProcessingMessage(downloadFilePath)
         messagingProvider.prepareMessageToSend(
-            incomingMessage.toProcessingMessage(downloadFilePath),
+            processedMessage.requestId,
+            processedMessage,
             SenderType.PROCESSING_SENDER
         )
     }
-
 
 }
 

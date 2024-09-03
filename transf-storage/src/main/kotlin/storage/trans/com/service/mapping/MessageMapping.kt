@@ -16,6 +16,7 @@ fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
     this.messageId = messageModel.messageId
     this.timestamp = messageModel.timeStampDate
     this.messageValue = ExposedBlob(messageModel.messageValue)
+    this.status = messageModel.status
     messageModel.messageResult?.let {
         this.messageResult = ExposedBlob(it)
     }
@@ -35,21 +36,6 @@ fun MessageEntity.toMessageModel() = MessageModel(
     this.messageResult?.bytes,
     this.status
 )
-
-fun MessageModel.toNewEntity(): MessageEntity {
-    val messageModel = this
-    return MessageEntity.new {
-        userId = messageModel.userId
-        requestId = messageModel.requestId
-        chatId = messageModel.chatId
-        timestamp = messageModel.timeStampDate
-        messageValue = ExposedBlob(messageModel.messageValue)
-        messageModel.messageResult?.let {
-            messageResult = ExposedBlob(it)
-        }
-        status = messageModel.status
-    }
-}
 
 fun MessageModel.updateTranscriptFields(incomingMessage: TranscriptMessageRequest): MessageModel {
     this.messageResult = Base64.getEncoder().encode(incomingMessage.messageResult.toByteArray())

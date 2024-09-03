@@ -93,7 +93,7 @@ class BotService {
                     }
                     else -> reply(
                         commonMessage,
-                        "Incorrect file type, please download voice or audio file"
+                        "Incorrect file type, please upload voice or audio file"
                     )
                 }
             }

@@ -6,6 +6,7 @@ ktor:
         port: 8097
 
 kafka:
+    groupId: "telegram-service-group"
     bootstrapServers:
         - "http://localhost:9092"
     producerTopics:

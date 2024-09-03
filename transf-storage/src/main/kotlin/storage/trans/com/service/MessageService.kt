@@ -39,6 +39,7 @@ class MessageServiceImpl(
             }
             val savedMessage = messageRepository.save(incomingMessage.toMessageModel())
             messagingProvider.prepareMessageToSend(
+                savedMessage.requestId,
                 savedMessage.toTranscriptResponse(),
                 SenderType.TRANSCRIPT_SENDER)
         } catch (ex: RepositoryException) {
@@ -53,6 +54,7 @@ class MessageServiceImpl(
                     .updateTranscriptFields(incomingMessage))
             val result = incomingMessage.messageResult
             messagingProvider.prepareMessageToSend(
+                incomingMessage.requestId,
                 updatedMessage.toTelegramResponse(result),
                 SenderType.TELEGRAM_SENDER)
         } catch (ex: Exception) {

@@ -1,15 +1,16 @@
 package com.trans.transcript.messaging
 
 
-import com.trans.transcript.serder.JsonDeserializer
-import com.trans.transcript.serder.JsonSerializer
 import com.trans.configuration.ConsumerInnerConfig
 import com.trans.configuration.KafkaInnerConfig
+import com.trans.transcript.serder.JsonDeserializer
+import com.trans.transcript.serder.JsonSerializer
 import com.trans.transcript.service.HandlerProvider
 import com.trans.transcript.service.processing.MessageHandler
-
 import io.ktor.server.application.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -18,10 +19,10 @@ import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
+import org.koin.java.KoinJavaComponent.inject
 import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import java.util.*
 
 fun Application.configureMessaging(kafkaConfig: KafkaInnerConfig) {
@@ -36,11 +37,15 @@ fun Application.configureMessaging(kafkaConfig: KafkaInnerConfig) {
 
 @Suppress("UNCHECKED_CAST")
 class MessagingProvider(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val handlerProvider: Lazy<HandlerProvider>
+    private val dispatcher: CoroutineDispatcher
 ) {
+
     private val logger: Logger = LoggerFactory.getLogger(MessagingProvider::class.java)
+
+    private val handlerProvider: HandlerProvider by inject(HandlerProvider::class.java)
+
     private lateinit var producer: KafkaProducer<String, Any>
+
     private var senderTypes = mutableMapOf<SenderType, String>()
 
     fun prepareProducerMessaging(kafkaConfig: KafkaInnerConfig) {
@@ -53,20 +58,20 @@ class MessagingProvider(
     fun prepareConsumerMessaging(kafkaConfig: KafkaInnerConfig) {
         kafkaConfig.consumerConfig.forEach { entry ->
             CoroutineScope(dispatcher).launch {
-                val consumer = createConsumer<Any>(entry.value, kafkaConfig.bootstrapServers)
+                val consumer = createConsumer<Any>(entry.value, kafkaConfig.bootstrapServers, kafkaConfig.groupId)
                 launchMessagesConsuming(consumer, entry.value.handlerName, entry.key)
             }
         }
     }
 
-    fun prepareMessageToSend(message: Any, senderType: SenderType) {
-        senderTypes[senderType]?.let { sendMessage(message, it) }
+    fun prepareMessageToSend(requestId: String, message: Any, senderType: SenderType) {
+        senderTypes[senderType]?.let { sendMessage(requestId, message, it) }
     }
 
 
-    private fun sendMessage(message: Any, topicName: String) {
+    private fun sendMessage(requestId: String, message: Any, topicName: String) {
         logger.info("Sending message - ${HandlerProvider.objectMapper.writeValueAsString(message)} to topic $topicName")
-        producer.send(ProducerRecord(topicName, message))
+        producer.send(ProducerRecord(topicName, requestId, message))
     }
 
     private fun <T> launchMessagesConsuming(
@@ -80,7 +85,7 @@ class MessagingProvider(
                 val records = consumer.poll(java.time.Duration.ofSeconds(1))
                 for (record: ConsumerRecord<String, T> in records) {
                     logger.info("Consumed message from topic ${record.topic()}")
-                    handlerProvider.value.retrieveHandler(enumValueOf(handlerName))?.let {
+                    handlerProvider.retrieveHandler(enumValueOf(handlerName))?.let {
                         (it as MessageHandler<T>).handleMessage(record)
                     }
                 }
@@ -92,15 +97,16 @@ class MessagingProvider(
 
     private fun <T> createConsumer(
         consumerConfig: ConsumerInnerConfig,
-        bootstrapServers: List<String>
+        bootstrapServers: List<String>,
+        groupId: String
     ): KafkaConsumer<String, T> {
         val props = Properties()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
-        props[ConsumerConfig.GROUP_ID_CONFIG] = "storage-group"
+        props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.name
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java.name
         props["value.deserializer.type"] = Class.forName(consumerConfig.deserializerType) as Class<T>
-        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
         return KafkaConsumer(props)
     }
 

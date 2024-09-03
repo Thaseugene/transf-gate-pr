@@ -49,26 +49,26 @@ class MessagingProvider(
         producer = createProducer(kafkaConfig)
     }
 
-    suspend fun prepareConsumerMessaging(kafkaConfig: KafkaInnerConfig) {
+    fun prepareConsumerMessaging(kafkaConfig: KafkaInnerConfig) {
         kafkaConfig.consumerConfig.forEach { entry ->
             CoroutineScope(dispatcher).launch {
-                val consumer = createConsumer<Any>(entry.value, kafkaConfig.bootstrapServers)
+                val consumer = createConsumer<Any>(entry.value, kafkaConfig.bootstrapServers, kafkaConfig.groupId)
                 launchMessagesConsuming(consumer, entry.value.handlerName, entry.key)
             }
         }
     }
 
-    fun prepareMessageToSend(message: Any, senderType: SenderType) {
-        senderTypes[senderType]?.let { sendMessage(message, it) }
+    fun prepareMessageToSend(requestId: String, message: Any, senderType: SenderType) {
+        senderTypes[senderType]?.let { sendMessage(requestId, message, it) }
     }
 
 
-    private fun sendMessage(message: Any, topicName: String) {
+    private fun sendMessage(requestId: String, message: Any, topicName: String) {
         logger.info("Sending message - ${HandlerProvider.objectMapper.writeValueAsString(message)} to topic $topicName")
-        producer.send(ProducerRecord(topicName, message))
+        producer.send(ProducerRecord(topicName, requestId, message))
     }
 
-    private suspend fun <T> launchMessagesConsuming(
+    private fun <T> launchMessagesConsuming(
         consumer: KafkaConsumer<String, T>,
         handlerName: String,
         topicName: String
@@ -91,15 +91,16 @@ class MessagingProvider(
 
     private fun <T> createConsumer(
         consumerConfig: ConsumerInnerConfig,
-        bootstrapServers: List<String>
+        bootstrapServers: List<String>,
+        groupId: String
     ): KafkaConsumer<String, T> {
         val props = Properties()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
-        props[ConsumerConfig.GROUP_ID_CONFIG] = "storage-group"
+        props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.name
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java.name
         props["value.deserializer.type"] = Class.forName(consumerConfig.deserializerType) as Class<T>
-        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
         return KafkaConsumer(props)
     }
 

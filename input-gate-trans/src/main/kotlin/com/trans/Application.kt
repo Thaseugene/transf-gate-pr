@@ -6,7 +6,7 @@ import com.trans.dependencyinjection.configureDependencies
 import com.trans.integration.tg.configureBot
 import com.trans.plugins.configureSerialization
 import io.ktor.server.application.*
-import storage.trans.com.messaging.configureMessaging
+import com.trans.messaging.configureMessaging
 
 fun main(args: Array<String>) {
     io.ktor.server.cio.EngineMain.main(args)
