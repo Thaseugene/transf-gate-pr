@@ -62,10 +62,11 @@ class MessagingProvider(
         senderTypes[senderType]?.let { sendMessage(requestId, message, it) }
     }
 
-
     private fun sendMessage(requestId: String, message: Any, topicName: String) {
         logger.info("Sending message - ${HandlerProvider.objectMapper.writeValueAsString(message)} to topic $topicName")
-        producer.send(ProducerRecord(topicName, requestId, message))
+        producer.use { kafkaProducer ->
+            kafkaProducer.send(ProducerRecord(topicName, requestId, message))
+        }
     }
 
     private fun <T> launchMessagesConsuming(
@@ -73,22 +74,23 @@ class MessagingProvider(
         handlerName: String,
         topicName: String
     ) {
-        consumer.subscribe(listOf(topicName))
-        while (true) {
-            try {
-                val records = consumer.poll(java.time.Duration.ofSeconds(1))
-                for (record: ConsumerRecord<String, T> in records) {
-                    logger.info("Consumed message from topic ${record.topic()}")
-                    handlerProvider.retrieveHandler(enumValueOf(handlerName))?.let {
-                        (it as MessageHandler<T>).handleMessage(record)
+        consumer.use { kafkaConsumer ->
+            kafkaConsumer.subscribe(listOf(topicName))
+            while (true) {
+                try {
+                    val records = kafkaConsumer.poll(java.time.Duration.ofSeconds(1))
+                    for (record: ConsumerRecord<String, T> in records) {
+                        logger.info("Consumed message from topic ${record.topic()}")
+                        handlerProvider.retrieveHandler(enumValueOf(handlerName))?.let {
+                            (it as MessageHandler<T>).handleMessage(record)
+                        }
                     }
+                } catch (e: Exception) {
+                    logger.error("Error occurred while processing message from topic", e)
                 }
-            } catch (e: Exception) {
-                logger.error("Error occurred while processing message from topic", e)
             }
         }
     }
-
     private fun <T> createConsumer(
         consumerConfig: ConsumerInnerConfig,
         bootstrapServers: List<String>,

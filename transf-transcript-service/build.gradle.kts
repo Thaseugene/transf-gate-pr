@@ -50,6 +50,8 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml")
 
+    implementation(project(":kafka-messaging"))
+
     // kafka
     implementation("org.apache.kafka:kafka-clients:3.4.0")
 

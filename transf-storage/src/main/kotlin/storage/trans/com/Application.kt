@@ -18,7 +18,5 @@ fun Application.module() {
     invokeMigrationProcess(configureDatabase(appConfiguration))
     configureDependencies()
     configureMessaging(appConfiguration.kafkaConfig)
-//    configureSerialization()
-
 
 }

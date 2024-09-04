@@ -1,10 +1,9 @@
 package com.trans.transcript
 
-import com.trans.configuration.ApplicationConfiguration
-import com.trans.configuration.configureApplication
+import com.trans.transcript.configuration.ApplicationConfiguration
+import com.trans.transcript.configuration.configureApplication
+import com.trans.transcript.configuration.configureMessaging
 import com.trans.transcript.dependencyinjection.configureDependencies
-import com.trans.transcript.messaging.configureMessaging
-import com.trans.transcript.plugins.configureSerialization
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -14,7 +13,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     val appConfiguration: ApplicationConfiguration = configureApplication()
 
-    configureSerialization()
     configureDependencies()
     configureMessaging(appConfiguration.kafkaConfig)
+
 }

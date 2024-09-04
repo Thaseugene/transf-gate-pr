@@ -1,9 +1,13 @@
 package com.trans.transcript.service.processing
 
 import com.trans.transcript.dto.MessageStatus
-import com.trans.transcript.integration.transacription.TranscriptionService
 import com.trans.transcript.dto.ProcessingMessageRequest
-import com.trans.transcript.messaging.MessagingProvider
+import com.trans.transcript.integration.transacription.TranscriptionService
+import com.trans.transcript.service.mapping.prepareProcessingResponse
+import com.transf.kafka.messaging.HandlerType
+import com.transf.kafka.messaging.MessagingProvider
+import com.transf.kafka.messaging.SenderType
+import com.transf.kafka.messaging.service.MessageHandler
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
@@ -16,10 +20,6 @@ import kotlinx.coroutines.launch
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import com.trans.transcript.messaging.HandlerType
-import com.trans.transcript.messaging.SenderType
-import com.trans.transcript.service.mapping.prepareProcessingResponse
-import io.ktor.client.engine.*
 import java.util.*
 
 class ProcessingMessageHandler(
