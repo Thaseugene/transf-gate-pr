@@ -19,4 +19,8 @@ fun Application.module() {
     configureDependencies()
     configureMessaging(appConfiguration.kafkaConfig)
 
+    environment.monitor.subscribe(ApplicationStopped) {
+        app.onShutdown()
+    }
+
 }

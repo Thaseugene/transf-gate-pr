@@ -3,6 +3,8 @@ package com.trans.transcript.dependencyinjection
 import com.trans.transcript.integration.client.HttpClientService
 import com.trans.transcript.integration.transacription.TranscriptionService
 import com.trans.transcript.service.HandlerProviderImpl
+import com.trans.transcript.service.MessageService
+import com.trans.transcript.service.MessageServiceImpl
 import com.transf.kafka.messaging.MessagingProvider
 import com.transf.kafka.messaging.MessagingProviderImpl
 import com.transf.kafka.messaging.service.HandlerProvider
@@ -17,7 +19,8 @@ val TG_SERVICE_MODULE = module {
     single { HttpClientService() }
     single { TranscriptionService(get()) }
     single { MessagingProviderImpl(get(), get()) as MessagingProvider }
-    single { HandlerProviderImpl() as HandlerProvider }
+    single { HandlerProviderImpl(get()) as HandlerProvider }
+    single { MessageServiceImpl() as MessageService }
 }
 
 fun Application.configureDependencies() {

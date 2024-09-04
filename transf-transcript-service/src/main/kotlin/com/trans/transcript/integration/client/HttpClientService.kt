@@ -37,7 +37,7 @@ class HttpClientService {
         url: String,
         method: HttpMethod,
         headers: Map<String, String> = emptyMap(),
-        contentType: ContentType?,
+        contentType: ContentType? = null,
         body: Any? = null
     ): T {
         return client.request(url) {
