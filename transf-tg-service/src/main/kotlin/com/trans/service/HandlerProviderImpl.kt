@@ -2,16 +2,14 @@ package com.trans.service
 
 import com.trans.integration.tg.BotService
 import com.trans.service.processing.ProcessingMessageHandler
-import com.transf.kafka.messaging.HandlerType
 import com.transf.kafka.messaging.service.HandlerProvider
+import com.transf.kafka.messaging.service.type.HandlerType
 import kotlinx.coroutines.CoroutineDispatcher
-import org.koin.java.KoinJavaComponent.inject
 
-class HandlerProviderImpl: HandlerProvider {
-
-    private val dispatcher: CoroutineDispatcher by inject(CoroutineDispatcher::class.java)
-
-    private val botService: BotService by inject(BotService::class.java)
+class HandlerProviderImpl(
+    private val dispatcher: CoroutineDispatcher,
+    private val botService: BotService
+): HandlerProvider {
 
     private val handlers = mutableMapOf<HandlerType, Any>()
 

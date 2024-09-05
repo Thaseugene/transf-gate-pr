@@ -1,21 +1,16 @@
 package com.trans.transcript.service
 
 import com.trans.transcript.integration.client.HttpClientService
-import com.trans.transcript.integration.transacription.TranscriptionService
 import com.trans.transcript.service.processing.ProcessingMessageHandler
-import com.transf.kafka.messaging.HandlerType
-import com.transf.kafka.messaging.MessagingProvider
 import com.transf.kafka.messaging.service.HandlerProvider
+import com.transf.kafka.messaging.service.type.HandlerType
 import kotlinx.coroutines.CoroutineDispatcher
-import org.koin.java.KoinJavaComponent.inject
 
 class HandlerProviderImpl(
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val messageService: MessageService,
+    private val clientService: HttpClientService
 ): HandlerProvider {
-
-    private val messageService: MessageService by inject(MessageService::class.java)
-
-    private val clientService: HttpClientService by inject(HttpClientService::class.java)
 
     private val handlers = mutableMapOf<HandlerType, Any>()
 

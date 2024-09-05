@@ -9,7 +9,7 @@ val koin_version: String by project
 val ktor_version: String by project
 
 plugins {
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "2.0.0"
     id("io.ktor.plugin") version "2.3.11"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
 }
@@ -51,6 +51,8 @@ dependencies {
     implementation("io.ktor:ktor-server-cio-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml")
+
+    implementation(project(":kafka-messaging"))
 
     // exposed
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")

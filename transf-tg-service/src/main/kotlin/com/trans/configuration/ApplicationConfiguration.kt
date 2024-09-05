@@ -7,6 +7,7 @@ import io.ktor.server.application.*
 
 class ApplicationConfiguration {
     lateinit var kafkaConfig: KafkaInnerConfig
+    lateinit var redisConfig: RedisConfig
 }
 
 fun Application.configureApplication(): ApplicationConfiguration {
@@ -32,7 +33,15 @@ fun Application.configureApplication(): ApplicationConfiguration {
         consumerInnerConfig.topicName to consumerInnerConfig
     }
 
+    val redisConfigObject = environment.config.config("redis")
+    val address = redisConfigObject.property("address").getString()
+
     appConfig.kafkaConfig = KafkaInnerConfig(groupId, bootstrapServers, consumerTopics, producerTopics)
+    appConfig.redisConfig = RedisConfig(address)
 
     return appConfig
 }
+
+data class RedisConfig(
+    val address: String
+)

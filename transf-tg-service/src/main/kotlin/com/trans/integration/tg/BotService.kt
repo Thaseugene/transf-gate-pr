@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.trans.domain.ProcessingMessageRequest
 import com.trans.service.MessageService
 import com.trans.service.MessageServiceImpl
+import com.trans.service.cache.CacheService
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
 import dev.inmo.tgbotapi.extensions.api.send.reply
@@ -44,9 +46,10 @@ fun Application.configureBot() {
     }
 }
 
-class BotService {
-
-    private val messageService:MessageService by inject(MessageService::class.java)
+class BotService(
+    private val messageService:MessageService,
+    private val cacheService: CacheService
+) {
 
     private val tgBot = telegramBot(System.getenv("botToken"))
 
@@ -106,6 +109,12 @@ class BotService {
     suspend fun sendAnswer(answer: String, chatId: Long, messageId: Long) {
         val replyParams = ReplyParameters(ChatId(RawChatId(chatId)), MessageId(messageId))
         tgBot.sendTextMessage(replyParams.chatIdentifier, answer, replyParameters = replyParams)
+    }
+
+    suspend fun sendErrorMessage(requestId: String) {
+        val incomingMessage = cacheService.retrieveCachedValue<ProcessingMessageRequest>(requestId)?.let {
+            sendAnswer("Something went wrong, please try later...", it.chatId, it.messageId)
+        }
     }
 
 }

@@ -1,53 +1,35 @@
-package com.transf.kafka.messaging
+package com.transf.kafka.messaging.service
 
 import com.transf.kafka.messaging.configuration.ConsumerInnerConfig
 import com.transf.kafka.messaging.configuration.KafkaInnerConfig
 import com.transf.kafka.messaging.serder.JsonDeserializer
-import com.transf.kafka.messaging.serder.JsonSerializer
-import com.transf.kafka.messaging.service.HandlerProvider
-import com.transf.kafka.messaging.service.MessageHandler
 import kotlinx.coroutines.*
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.util.*
 
-interface MessagingProvider {
-
-    fun prepareProducerMessaging(kafkaConfig: KafkaInnerConfig)
+interface ConsumingProvider {
 
     fun prepareConsumerMessaging(kafkaConfig: KafkaInnerConfig)
 
-    fun prepareMessageToSend(requestId: String, message: Any, senderType: SenderType)
+    fun stopConsuming()
 
 }
 
 @Suppress("UNCHECKED_CAST")
-class MessagingProviderImpl(
+class ConsumingProviderImpl(
     private val dispatcher: CoroutineDispatcher,
     private val handlerProvider: HandlerProvider
-): MessagingProvider {
+): ConsumingProvider {
 
-    private val logger: Logger = LoggerFactory.getLogger(MessagingProviderImpl::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(ConsumingProviderImpl::class.java)
 
-    private lateinit var producer: KafkaProducer<String, Any>
-
-    private var senderTypes = mutableMapOf<SenderType, String>()
-
-    override fun prepareProducerMessaging(kafkaConfig: KafkaInnerConfig) {
-        kafkaConfig.producerTopics.forEach { entry ->
-            senderTypes[enumValueOf(entry.value.senderType)] = entry.key
-        }
-        producer = createProducer(kafkaConfig)
-    }
+    private var isShutDown: Boolean = false;
 
     override fun prepareConsumerMessaging(kafkaConfig: KafkaInnerConfig) {
         kafkaConfig.consumerConfig.forEach { entry ->
@@ -58,15 +40,8 @@ class MessagingProviderImpl(
         }
     }
 
-    override fun prepareMessageToSend(requestId: String, message: Any, senderType: SenderType) {
-        senderTypes[senderType]?.let { sendMessage(requestId, message, it) }
-    }
-
-    private fun sendMessage(requestId: String, message: Any, topicName: String) {
-        logger.info("Sending message - ${HandlerProvider.objectMapper.writeValueAsString(message)} to topic $topicName")
-        producer.use { kafkaProducer ->
-            kafkaProducer.send(ProducerRecord(topicName, requestId, message))
-        }
+    override fun stopConsuming() {
+        isShutDown = true
     }
 
     private fun <T> launchMessagesConsuming(
@@ -76,7 +51,7 @@ class MessagingProviderImpl(
     ) {
         consumer.use { kafkaConsumer ->
             kafkaConsumer.subscribe(listOf(topicName))
-            while (true) {
+            while (!isShutDown) {
                 try {
                     val records = kafkaConsumer.poll(java.time.Duration.ofSeconds(1))
                     for (record: ConsumerRecord<String, T> in records) {
@@ -89,6 +64,7 @@ class MessagingProviderImpl(
                     logger.error("Error occurred while processing message from topic", e)
                 }
             }
+            logger.info("Message consuming stopped")
         }
     }
 
@@ -105,14 +81,6 @@ class MessagingProviderImpl(
         props["value.deserializer.type"] = Class.forName(consumerConfig.deserializerType) as Class<T>
         props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
         return KafkaConsumer(props)
-    }
-
-    private fun createProducer(kafkaConfig: KafkaInnerConfig): KafkaProducer<String, Any> {
-        val props = Properties()
-        props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaConfig.bootstrapServers
-        props[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java.name
-        props[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = JsonSerializer::class.java.name
-        return KafkaProducer(props)
     }
 
 }

@@ -1,8 +1,6 @@
 package com.trans
 
-import com.trans.configuration.ApplicationConfiguration
-import com.trans.configuration.configureApplication
-import com.trans.configuration.configureMessaging
+import com.trans.configuration.*
 import com.trans.dependencyinjection.configureDependencies
 import com.trans.integration.tg.configureBot
 import io.ktor.server.application.*
@@ -12,11 +10,15 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-
-    val appConfiguration: ApplicationConfiguration = configureApplication()
-
     configureDependencies()
-    configureMessaging(appConfiguration.kafkaConfig)
+    configureApplication().also {
+        configureCache(it)
+        configureMessaging(it)
+    }
     configureBot()
+
+    environment.monitor.subscribe(ApplicationStopPreparing) {
+        configureShutdownEvent()
+    }
 
 }

@@ -3,10 +3,9 @@ package com.trans.transcript.service
 import com.trans.transcript.dto.MessageStatus
 import com.trans.transcript.integration.transacription.TranscriptionService
 import com.trans.transcript.service.mapping.prepareProcessingResponse
-import com.transf.kafka.messaging.MessagingProvider
-import com.transf.kafka.messaging.SenderType
+import com.transf.kafka.messaging.service.ProducingProvider
+import com.transf.kafka.messaging.service.type.SenderType
 import io.ktor.client.statement.*
-import org.koin.java.KoinJavaComponent.inject
 
 interface MessageService {
 
@@ -16,15 +15,14 @@ interface MessageService {
 
 }
 
-class MessageServiceImpl: MessageService {
-
-    private val transcriptionService: TranscriptionService by inject(TranscriptionService::class.java)
-
-    private val messagingProvider: MessagingProvider  by inject(MessagingProvider::class.java)
+class MessageServiceImpl(
+    private val transcriptionService: TranscriptionService,
+    private val producingProvider: ProducingProvider
+): MessageService {
 
     override suspend fun processTranscriptionMessage(response: HttpResponse, requestId: String) {
         val result = transcriptionService.tryToMakeTranscript(response.readBytes())
-        messagingProvider.prepareMessageToSend(
+        producingProvider.prepareMessageToSend(
             requestId,
             prepareProcessingResponse(
                 requestId,
@@ -36,7 +34,7 @@ class MessageServiceImpl: MessageService {
     }
 
     override suspend fun sendErrorMessage(requestId: String) {
-        messagingProvider.prepareMessageToSend(
+        producingProvider.prepareMessageToSend(
             requestId,
             prepareProcessingResponse(requestId, MessageStatus.ERROR, MessageStatus.ERROR.name),
             SenderType.PROCESSING_SENDER

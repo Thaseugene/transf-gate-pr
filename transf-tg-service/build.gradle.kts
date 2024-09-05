@@ -53,6 +53,11 @@ dependencies {
 
     implementation(project(":kafka-messaging"))
 
+    //redis
+    implementation("io.lettuce:lettuce-core:6.3.2.RELEASE")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.7.3")
+
     //tg bot api
     implementation("dev.inmo:tgbotapi:$telegram_bot_api_version")
 

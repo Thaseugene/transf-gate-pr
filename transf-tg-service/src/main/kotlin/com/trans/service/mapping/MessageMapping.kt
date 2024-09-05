@@ -2,10 +2,12 @@ package com.trans.service.mapping
 
 import com.trans.domain.MessageStatus
 import com.trans.domain.ProcessingMessageRequest
+import com.trans.domain.ProcessingMessageResponse
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.MediaContent
 import java.util.*
+import kotlin.reflect.full.memberFunctions
 
 
 fun ContentMessage<MediaContent>.toProcessingMessage(messageValue: String): ProcessingMessageRequest =
@@ -21,3 +23,14 @@ fun ContentMessage<MediaContent>.toProcessingMessage(messageValue: String): Proc
         firstName = this.from?.firstName,
         lastName = this.from?.lastName
     )
+
+fun ProcessingMessageResponse.validate(): Boolean {
+    val components = this::class.memberFunctions
+        .filter { it.name.startsWith("component") && it.parameters.size == 1 }
+        .sortedBy { it.name }
+
+    return components.all { component ->
+        val value = component.call(this)
+        value != null
+    }
+}

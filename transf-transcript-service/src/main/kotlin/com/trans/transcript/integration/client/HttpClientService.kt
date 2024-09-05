@@ -10,7 +10,6 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
-import io.ktor.util.reflect.*
 
 class HttpClientService {
 

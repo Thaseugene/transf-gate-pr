@@ -57,6 +57,14 @@ services:
     networks:
       - kafka-net
 
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    networks:
+      - kafka-net
+    restart: always
+
 networks:
   kafka-net:
     driver: bridge

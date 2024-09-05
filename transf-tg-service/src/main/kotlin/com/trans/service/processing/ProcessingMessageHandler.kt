@@ -2,8 +2,8 @@ package com.trans.service.processing
 
 import com.trans.domain.ProcessingMessageResponse
 import com.trans.integration.tg.BotService
-import com.transf.kafka.messaging.HandlerType
 import com.transf.kafka.messaging.service.MessageHandler
+import com.transf.kafka.messaging.service.type.HandlerType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -22,6 +22,10 @@ class ProcessingMessageHandler(
         CoroutineScope(dispatcher).launch {
             message.value()?.let {
                 logger.info("Handled message -> ${message.value()}")
+                if (it.result == null || it.chatId == null || it.messageId == null) {
+                    botService.sendErrorMessage(message.key())
+                    return@launch;
+                }
                 botService.sendAnswer(it.result, it.chatId, it.messageId)
             }
         }

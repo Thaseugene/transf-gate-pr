@@ -1,5 +1,8 @@
 package storage.trans.com.configuration
 
+import com.transf.kafka.messaging.configuration.ConsumerInnerConfig
+import com.transf.kafka.messaging.configuration.KafkaInnerConfig
+import com.transf.kafka.messaging.configuration.ProducerInnerConfig
 import io.ktor.server.application.*
 
 class ApplicationConfiguration {
@@ -49,22 +52,4 @@ data class DatabaseConfig(
     val user: String,
     val password: String,
     val maxPoolSize: Int
-)
-
-data class KafkaInnerConfig(
-    val groupId: String,
-    val bootstrapServers: List<String>,
-    val consumerConfig: Map<String, ConsumerInnerConfig>,
-    val producerTopics: Map<String, ProducerInnerConfig>
-)
-
-data class ConsumerInnerConfig(
-    val topicName: String,
-    val handlerName: String,
-    val deserializerType: String
-)
-
-data class ProducerInnerConfig(
-    val topicName: String,
-    val senderType: String
 )

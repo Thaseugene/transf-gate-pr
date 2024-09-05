@@ -17,3 +17,6 @@ kafka:
           handler: "PROCESSING_HANDLER"
           deserializerType: "com.trans.domain.ProcessingMessageResponse"
 
+redis:
+  address: "redis://localhost:6379"
+

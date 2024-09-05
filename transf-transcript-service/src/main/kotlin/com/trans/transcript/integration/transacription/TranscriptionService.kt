@@ -6,24 +6,28 @@ import com.trans.transcript.dto.TranscriptResponse
 import com.trans.transcript.dto.UploadResponse
 import com.trans.transcript.exception.TranscriptionExternalException
 import com.trans.transcript.integration.client.HttpClientService
-import com.transf.kafka.messaging.MessagingProvider
 import io.ktor.http.*
 import kotlinx.coroutines.delay
-import org.koin.java.KoinJavaComponent.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class TranscriptionService(
-    private val clientService: HttpClientService
-) {
+interface TranscriptionService {
 
-    private val logger: Logger = LoggerFactory.getLogger(TranscriptionService::class.java)
+    suspend fun tryToMakeTranscript(bytesToAnalyze: ByteArray): String
+
+}
+
+class TranscriptionServiceImpl(
+    private val clientService: HttpClientService
+): TranscriptionService {
+
+    private val logger: Logger = LoggerFactory.getLogger(TranscriptionServiceImpl::class.java)
 
     private val apiKey: String = System.getenv("apiKey");
 
     private val authHeaders = mapOf("Authorization" to apiKey)
 
-    suspend fun tryToMakeTranscript(bytesToAnalyze: ByteArray): String {
+    override suspend fun tryToMakeTranscript(bytesToAnalyze: ByteArray): String {
         val uploadedFileUrl = uploadFile(bytesToAnalyze)
         return getTranscript(uploadedFileUrl)
     }
