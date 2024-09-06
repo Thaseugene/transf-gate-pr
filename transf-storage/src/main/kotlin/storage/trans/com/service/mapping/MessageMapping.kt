@@ -72,6 +72,7 @@ fun MessageModel.toTelegramResponse(result: String) = TelegramMessageResponse(
     this.requestId,
     this.chatId,
     this.messageId,
-    result
+    result,
+    this.status ?: MessageStatus.ERROR
 )
 

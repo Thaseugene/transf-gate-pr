@@ -11,18 +11,20 @@ import io.lettuce.core.api.coroutines.RedisCoroutinesCommands
 @OptIn(ExperimentalLettuceCoroutinesApi::class)
 class CacheService {
 
-    private lateinit var redisClient: RedisClient
+    private var cacheMessageDuration: Long = Long.MAX_VALUE
 
-    private lateinit var redisConnection: RedisCoroutinesCommands<String, String>
+    private var redisClient: RedisClient? = null
 
-    lateinit var redisCommands: RedisCoroutinesCommands<String, String>
+    private var redisConnection: RedisCoroutinesCommands<String, String>? = null
+
+    var redisCommands: RedisCoroutinesCommands<String, String>? = null
 
     suspend fun insertCacheData(key: String, value: Any) {
-        redisCommands.set(key, HandlerProvider.objectMapper.writeValueAsString(value))
+        redisCommands?.setex(key, cacheMessageDuration, HandlerProvider.objectMapper.writeValueAsString(value))
     }
 
     suspend inline fun <reified T> retrieveCachedValue(key: String): T? {
-        val cachedValue = redisCommands.get(key)
+        val cachedValue = redisCommands?.get(key)
         if (cachedValue != null) {
             return HandlerProvider.objectMapper.readValue(cachedValue, object: TypeReference<T>() {})
         }
@@ -30,15 +32,18 @@ class CacheService {
     }
 
     suspend fun onShutdown() {
-        redisConnection.shutdown(true)
-        redisClient.close()
+        redisConnection?.shutdown(true)
+        redisClient?.close()
     }
 
     fun prepareRedisConnection(redisConfig: RedisConfig) {
         redisClient = RedisClient.create(redisConfig.address)
-        redisConnection = redisClient.connect().coroutines().also {
-            redisCommands = it
+        redisClient?.let {
+            redisConnection = it.connect().coroutines().also { connection ->
+                redisCommands = connection
+            }
         }
+        cacheMessageDuration = redisConfig.cacheMessageDuration
     }
 
 }

@@ -17,6 +17,8 @@ interface ProducingProvider {
 
     fun prepareMessageToSend(requestId: String, message: Any, senderType: SenderType)
 
+    fun onShutdown()
+
 }
 
 class ProducingProviderImpl : ProducingProvider {
@@ -38,11 +40,13 @@ class ProducingProviderImpl : ProducingProvider {
         senderTypes[senderType]?.let { sendMessage(requestId, message, it) }
     }
 
+    override fun onShutdown() {
+        producer.close()
+    }
+
     private fun sendMessage(requestId: String, message: Any, topicName: String) {
         logger.info("Sending message - ${HandlerProvider.objectMapper.writeValueAsString(message)} to topic $topicName")
-        producer.use { kafkaProducer ->
-            kafkaProducer.send(ProducerRecord(topicName, requestId, message))
-        }
+        producer.send(ProducerRecord(topicName, requestId, message))
     }
 
     private fun createProducer(kafkaConfig: KafkaInnerConfig): KafkaProducer<String, Any> {

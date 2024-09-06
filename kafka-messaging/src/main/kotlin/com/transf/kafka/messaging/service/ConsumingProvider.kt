@@ -17,7 +17,7 @@ interface ConsumingProvider {
 
     fun prepareConsumerMessaging(kafkaConfig: KafkaInnerConfig)
 
-    fun stopConsuming()
+    fun onShutdown()
 
 }
 
@@ -40,7 +40,7 @@ class ConsumingProviderImpl(
         }
     }
 
-    override fun stopConsuming() {
+    override fun onShutdown() {
         isShutDown = true
     }
 

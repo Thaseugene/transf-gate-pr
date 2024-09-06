@@ -21,12 +21,17 @@ class ProcessingMessageHandler(
     override fun handleMessage(message: ConsumerRecord<String, ProcessingMessageResponse>) {
         CoroutineScope(dispatcher).launch {
             message.value()?.let {
-                logger.info("Handled message -> ${message.value()}")
-                if (it.result == null || it.chatId == null || it.messageId == null) {
-                    botService.sendErrorMessage(message.key())
-                    return@launch;
+                try {
+                    logger.info("Handled message -> ${message.value()}")
+                    if (it.result == null || it.chatId == null || it.messageId == null) {
+                        botService.sendErrorMessage(message.key())
+                        return@launch;
+                    }
+                    botService.sendSuccessTranscriptMessage(it.result, it.chatId, it.messageId, message.key())
+                } catch (ex: Exception) {
+                    logger.error("Error handled while sending answer to tg service", ex)
                 }
-                botService.sendAnswer(it.result, it.chatId, it.messageId)
+
             }
         }
     }

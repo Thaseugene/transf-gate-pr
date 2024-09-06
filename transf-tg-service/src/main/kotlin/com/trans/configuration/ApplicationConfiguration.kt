@@ -35,13 +35,15 @@ fun Application.configureApplication(): ApplicationConfiguration {
 
     val redisConfigObject = environment.config.config("redis")
     val address = redisConfigObject.property("address").getString()
+    val cacheMessageDuration = redisConfigObject.property("cacheMessageDuration").getString().toLong()
 
     appConfig.kafkaConfig = KafkaInnerConfig(groupId, bootstrapServers, consumerTopics, producerTopics)
-    appConfig.redisConfig = RedisConfig(address)
+    appConfig.redisConfig = RedisConfig(address, cacheMessageDuration)
 
     return appConfig
 }
 
 data class RedisConfig(
-    val address: String
+    val address: String,
+    val cacheMessageDuration: Long
 )

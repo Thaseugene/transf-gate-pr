@@ -8,9 +8,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import storage.trans.com.domain.MessageModel
 import storage.trans.com.domain.TelegramMessageRequest
+import storage.trans.com.domain.TelegramMessageResponse
 import storage.trans.com.domain.TranscriptMessageRequest
 import storage.trans.com.persistance.MessageRepository
 import storage.trans.com.persistance.UserRepository
+import storage.trans.com.persistance.entity.MessageStatus
 
 
 interface MessageService {
@@ -41,7 +43,12 @@ class MessageServiceImpl(
                 savedMessage.toTranscriptResponse(),
                 SenderType.TRANSCRIPT_SENDER)
         } catch (ex: RepositoryException) {
-            logger.error("Error occurred while processing incoming message", ex)
+            logger.error("Error occurred while processing incoming message with requestId - " +
+                    incomingMessage.requestId, ex)
+            producingProvider.prepareMessageToSend(
+                incomingMessage.requestId,
+                TelegramMessageResponse(status = MessageStatus.ERROR),
+                SenderType.TELEGRAM_SENDER)
         }
     }
 
@@ -58,6 +65,10 @@ class MessageServiceImpl(
         } catch (ex: Exception) {
             logger.error("Exception occurred while while processing message with requestId - " +
                     "${incomingMessage.requestId} from transcription service", ex)
+            producingProvider.prepareMessageToSend(
+                incomingMessage.requestId,
+                TelegramMessageResponse(status = MessageStatus.ERROR),
+                SenderType.TELEGRAM_SENDER)
         }
     }
 
