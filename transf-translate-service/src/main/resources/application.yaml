@@ -1,0 +1,18 @@
+ktor:
+  application:
+    modules:
+      - translate.transf.com.ApplicationKt.module
+  deployment:
+    port: 8088
+
+kafka:
+  groupId: "translate-service-group"
+  bootstrapServers:
+    - "http://localhost:9092"
+  producerTopics:
+    - name: "translate-incoming-storage"
+      senderType: "PROCESSING_SENDER"
+  consumerTopics:
+    - name: "translate-out-storage"
+      handler: "PROCESSING_HANDLER"
+      deserializerType: "com.trans.translate.dto.ProcessingMessageRequest"
