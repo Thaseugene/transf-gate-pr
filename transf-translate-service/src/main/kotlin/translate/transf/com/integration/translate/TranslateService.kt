@@ -1,9 +1,6 @@
 package translate.transf.com.integration.translate
 
 import io.ktor.http.*
-import okhttp3.internal.immutableListOf
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import translate.transf.com.dto.TranslateRequest
 import translate.transf.com.dto.TranslateResponse
 import translate.transf.com.integration.client.HttpClientService

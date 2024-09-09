@@ -1,6 +1,8 @@
-package com.trans.exception
+package storage.trans.com.exception
 
-open class InnerException(val expCode: ExpCode, message: String): RuntimeException(message) {
+import storage.trans.com.exception.ExpCode
+
+open class InnerException(message: String): RuntimeException(message) {
 
     val timeStamp: Long = System.currentTimeMillis()
 

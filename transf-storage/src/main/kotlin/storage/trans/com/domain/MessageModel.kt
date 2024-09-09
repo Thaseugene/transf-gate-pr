@@ -18,6 +18,7 @@ data class MessageModel(
     val timeStamp: Long,
     val messageValue: ByteArray,
     var messageResult: ByteArray? = null,
+    var translateResult: ByteArray? = null,
     var status: MessageStatus? = null
 ) {
 

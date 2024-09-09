@@ -1,6 +1,6 @@
 package storage.trans.com.persistance
 
-import com.trans.exception.ExpCode
+import storage.trans.com.exception.ExpCode
 import com.trans.exception.RepositoryException
 import com.trans.service.mapping.toUserModel
 import com.trans.service.mapping.updateFields

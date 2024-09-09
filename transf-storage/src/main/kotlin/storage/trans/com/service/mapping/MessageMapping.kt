@@ -20,6 +20,9 @@ fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
     messageModel.messageResult?.let {
         this.messageResult = ExposedBlob(it)
     }
+    messageModel.translateResult?.let {
+        this.translateResult = ExposedBlob(it)
+    }
     return messageModel.copy(
         id = this.id.value
     )
@@ -34,11 +37,18 @@ fun MessageEntity.toMessageModel() = MessageModel(
     this.timestamp.toEpochSecond(ZoneOffset.UTC),
     this.messageValue.bytes,
     this.messageResult?.bytes,
+    this.translateResult?.bytes,
     this.status
 )
 
 fun MessageModel.updateTranscriptFields(incomingMessage: TranscriptMessageRequest): MessageModel {
     this.messageResult = Base64.getEncoder().encode(incomingMessage.messageResult.toByteArray())
+    this.status = incomingMessage.status
+    return this
+}
+
+fun MessageModel.updateTranslateFields(incomingMessage: TranslateMessageRequest): MessageModel {
+    this.translateResult = Base64.getEncoder().encode(incomingMessage.translatedValue?.toByteArray())
     this.status = incomingMessage.status
     return this
 }
@@ -51,8 +61,7 @@ fun TelegramMessageRequest.toMessageModel() = MessageModel(
     this.messageId,
     this.timeStamp,
     this.messageValue,
-    this.messageResult,
-    MessageStatus.NEW
+    status = MessageStatus.NEW
 )
 
 fun TelegramMessageRequest.toUserModel() = UserModel(
@@ -73,6 +82,14 @@ fun MessageModel.toTelegramResponse(result: String) = TelegramMessageResponse(
     this.chatId,
     this.messageId,
     result,
-    this.status ?: MessageStatus.ERROR
+    status = this.status ?: MessageStatus.ERROR
+)
+
+fun MessageModel.toTelegramTranslateResponse(result: String) = TelegramMessageResponse(
+    this.requestId,
+    this.chatId,
+    this.messageId,
+    translatedResult = result,
+    status = this.status ?: MessageStatus.ERROR
 )
 

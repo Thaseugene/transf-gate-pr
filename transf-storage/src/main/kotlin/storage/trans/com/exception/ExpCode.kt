@@ -1,4 +1,4 @@
-package com.trans.exception
+package storage.trans.com.exception
 
 import io.ktor.http.*
 

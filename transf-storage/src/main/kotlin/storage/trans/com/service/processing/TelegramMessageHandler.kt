@@ -19,8 +19,6 @@ class TelegramMessageHandler(
         messageService.processIncomingMessage(message.value())
     }
 
-    override fun getType(): HandlerType {
-        return HandlerType.TELEGRAM_HANDLER
-    }
+    override fun getType() = HandlerType.TELEGRAM_HANDLER
 
 }

@@ -19,8 +19,6 @@ class TranscriptMessageHandler(
         messageService.processIncomingTranscriptMessage(message.value())
     }
 
-    override fun getType(): HandlerType {
-        return HandlerType.TRANSCRIPT_HANDLER
-    }
+    override fun getType() = HandlerType.TRANSCRIPT_HANDLER
 
 }

@@ -22,6 +22,8 @@ kafka:
       senderType: "TRANSCRIPT_SENDER"
     - name: "tg-out-storage"
       senderType: "TELEGRAM_SENDER"
+    - name: "translate-out-storage"
+      senderType: "TRANSLATE_SENDER"
   consumerTopics:
     - name: "transcript-incoming-storage"
       handler: "TRANSCRIPT_HANDLER"
@@ -29,3 +31,6 @@ kafka:
     - name: "tg-incoming-storage"
       handler: "TELEGRAM_HANDLER"
       deserializerType: "storage.trans.com.domain.TelegramMessageRequest"
+    - name: "translate-incoming-storage"
+      handler: "TRANSLATE_HANDLER"
+      deserializerType: "storage.trans.com.domain.TranslateMessageRequest"

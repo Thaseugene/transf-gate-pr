@@ -9,5 +9,6 @@ data class TelegramMessageResponse(
     val chatId: Long? = null,
     val messageId: Long? = null,
     val result: String? = null,
+    val translatedResult: String? = null,
     val status: MessageStatus
 )

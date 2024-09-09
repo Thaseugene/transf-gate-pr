@@ -15,6 +15,7 @@ class MessageEntity(id: EntityID<Long>) : LongEntity(id) {
     var timestamp by MessageTable.timeStamp
     var messageValue by MessageTable.messageValue
     var messageResult by MessageTable.messageResult
+    var translateResult by MessageTable.translateResult
     var status by MessageTable.status
 
     companion object : LongEntityClass<MessageEntity>(MessageTable)
@@ -30,6 +31,7 @@ object MessageTable : LongIdTable("MESSAGES", "ID") {
     val timeStamp = datetime("TIMESTAMP")
     val messageValue = blob("MESSAGE_VALUE")
     val messageResult = blob("MESSAGE_RESULT").nullable()
+    val translateResult = blob("TRANSLATE_RESULT").nullable()
     val status = enumeration("STATUS", MessageStatus::class).nullable()
 
 }

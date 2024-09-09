@@ -1,6 +1,6 @@
 package storage.trans.com.persistance
 
-import com.trans.exception.ExpCode
+import storage.trans.com.exception.ExpCode
 import com.trans.exception.RepositoryException
 import com.trans.service.mapping.toMessageModel
 import com.trans.service.mapping.updateFields
@@ -47,28 +47,28 @@ class MessageRepositoryImpl : MessageRepository {
         )
     }
 
-    override fun findByMessageId(messageId: Long): MessageModel {
+    override fun findByMessageId(messageId: Long): MessageModel = transaction {
         val messageList = findBy(MessageTable.messageId, messageId)
         if (messageList.isEmpty()) {
             throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $messageId doesn't exists")
         }
-        return messageList.first()?.toMessageModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $messageId doesn't exists")
+        messageList.first()?.toMessageModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $messageId doesn't exists")
     }
 
-    override fun findByChatId(chatId: Long): List<MessageModel> {
+    override fun findByChatId(chatId: Long): List<MessageModel> = transaction {
         val messageList = findBy(MessageTable.chatId, chatId).filterNotNull().map { it.toMessageModel() }
         if (messageList.isEmpty()) {
             throw RepositoryException(ExpCode.NOT_FOUND, "Messages with chatId = $chatId doesn't exists")
         }
-        return messageList
+        messageList
     }
 
-    override fun findByUserId(userId: Long): List<MessageModel> {
+    override fun findByUserId(userId: Long): List<MessageModel> = transaction {
         val messageList = findBy(MessageTable.userId, userId).filterNotNull().map { it.toMessageModel() }
         if (messageList.isEmpty()) {
             throw RepositoryException(ExpCode.NOT_FOUND, "Messages with userId = $userId doesn't exists")
         }
-        return messageList
+        messageList
     }
 
     override fun findByRequestId(requestId: String): MessageModel = transaction {
@@ -79,18 +79,18 @@ class MessageRepositoryImpl : MessageRepository {
         messageList.first()?.toMessageModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $requestId doesn't exists")
     }
 
-    override fun delete(id: Long) {
+    override fun delete(id: Long) = transaction {
         val existing = findExistingById(id) ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with id = $id doesn't exists")
         existing.delete()
     }
 
     override fun update(messageModel: MessageModel): MessageModel = transaction {
-        val existing = findExistingById(messageModel.id) ?: throw RepositoryException(ExpCode.NOT_FOUND, "Event with id = ${messageModel.id} doesn't exists")
+        val existing = findExistingById(messageModel.id) ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with id = ${messageModel.id} doesn't exists")
         existing.updateFields(messageModel)
     }
 
     override fun findById(id: Long): MessageModel = transaction {
-        findExistingById(id)?.toMessageModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Event with id = $id doesn't exists")
+        findExistingById(id)?.toMessageModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with id = $id doesn't exists")
     }
 
     override fun findAll(): List<MessageModel> = transaction {
