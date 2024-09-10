@@ -125,13 +125,8 @@ class BotService(
         }
     }
 
-    suspend fun sendAnswer(answer: String, chatId: Long, messageId: Long) {
-        val replyParams = ReplyParameters(ChatId(RawChatId(chatId)), MessageId(messageId))
-        tgBot.sendTextMessage(replyParams.chatIdentifier, answer, replyParameters = replyParams)
-    }
-
     suspend fun sendErrorMessage(requestId: String) {
-        val incomingMessage = cacheService.retrieveCachedValue<ProcessingMessageRequest>(requestId)?.let {
+        cacheService.retrieveCachedValue<ProcessingMessageRequest>(requestId)?.let {
             sendAnswer("Something went wrong, please try later...", it.chatId, it.messageId)
         }
     }
@@ -167,6 +162,15 @@ class BotService(
                 )
             )
         )
+    }
+
+    suspend fun sendLangChooseMessage(chatId: Long, previousRequestId: String) {
+
+    }
+
+    private suspend fun sendAnswer(answer: String, chatId: Long, messageId: Long) {
+        val replyParams = ReplyParameters(ChatId(RawChatId(chatId)), MessageId(messageId))
+        tgBot.sendTextMessage(replyParams.chatIdentifier, answer, replyParameters = replyParams)
     }
 
 }
