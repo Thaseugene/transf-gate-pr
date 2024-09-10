@@ -12,7 +12,6 @@
 
 <!-- Примеры настройки логгеров для различных библиотек -->
 <logger name="org.eclipse.jetty" level="INFO"/>
-<logger name="io.netty" level="INFO"/>
 <logger name="io.ktor" level="ALL"/>
 <logger name="org.apache.kafka" level="WARN"/>
 <logger name="org.jetbrains.exposed" level="ALL"/>

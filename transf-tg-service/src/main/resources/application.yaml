@@ -1,7 +1,7 @@
 ktor:
     application:
         modules:
-            - com.trans.ApplicationKt.module
+            - com.trans.telegram.ApplicationKt.module
     deployment:
         port: 8097
 
@@ -15,7 +15,7 @@ kafka:
     consumerTopics:
         - name: "tg-out-storage"
           handler: "PROCESSING_HANDLER"
-          deserializerType: "com.trans.domain.ProcessingMessageResponse"
+          deserializerType: "com.trans.telegram.domain.ProcessingMessageResponse"
 
 redis:
   address: "redis://localhost:6379"
