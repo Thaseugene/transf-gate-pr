@@ -2,8 +2,8 @@ package storage.trans.com.persistance
 
 import storage.trans.com.exception.ExpCode
 import com.trans.exception.RepositoryException
-import com.trans.service.mapping.toMessageModel
-import com.trans.service.mapping.updateFields
+import storage.trans.com.service.mapping.toMessageModel
+import storage.trans.com.service.mapping.updateFields
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
@@ -19,7 +19,7 @@ interface MessageRepository {
     fun findByMessageId(messageId: Long): MessageModel
     fun findByChatId(chatId: Long): List<MessageModel>
     fun findByUserId(userId: Long): List<MessageModel>
-    fun findByRequestId(requestId: String): MessageModel
+    fun findByRequestId(requestId: String): MessageModel?
     fun delete(id: Long)
     fun update(messageModel: MessageModel): MessageModel
     fun findById(id: Long): MessageModel
@@ -71,12 +71,9 @@ class MessageRepositoryImpl : MessageRepository {
         messageList
     }
 
-    override fun findByRequestId(requestId: String): MessageModel = transaction {
+    override fun findByRequestId(requestId: String): MessageModel? = transaction {
         val messageList = findBy(MessageTable.requestId, requestId)
-        if (messageList.isEmpty()) {
-            throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $requestId doesn't exists")
-        }
-        messageList.first()?.toMessageModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "Message with messageId = $requestId doesn't exists")
+        messageList.first()?.toMessageModel()
     }
 
     override fun delete(id: Long) = transaction {

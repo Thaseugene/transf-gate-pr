@@ -1,9 +1,9 @@
-package translate.transf.com.service
+package com.trans.translate.service
 
 import com.transf.kafka.messaging.service.HandlerProvider
 import com.transf.kafka.messaging.service.type.HandlerType
 import kotlinx.coroutines.CoroutineDispatcher
-import translate.transf.com.service.processing.ProcessingMessageHandler
+import com.trans.translate.service.processing.ProcessingMessageHandler
 
 class HandlerProviderImpl(
     private val dispatcher: CoroutineDispatcher,

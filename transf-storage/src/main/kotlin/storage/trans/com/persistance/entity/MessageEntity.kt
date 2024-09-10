@@ -16,6 +16,7 @@ class MessageEntity(id: EntityID<Long>) : LongEntity(id) {
     var messageValue by MessageTable.messageValue
     var messageResult by MessageTable.messageResult
     var translateResult by MessageTable.translateResult
+    var lang by MessageTable.lang
     var status by MessageTable.status
 
     companion object : LongEntityClass<MessageEntity>(MessageTable)
@@ -32,6 +33,7 @@ object MessageTable : LongIdTable("MESSAGES", "ID") {
     val messageValue = blob("MESSAGE_VALUE")
     val messageResult = blob("MESSAGE_RESULT").nullable()
     val translateResult = blob("TRANSLATE_RESULT").nullable()
+    val lang = varchar("TRANSLATE_LANGUAGE", DEFAULT_VARCHAR_COLUMN_LENGTH).nullable()
     val status = enumeration("STATUS", MessageStatus::class).nullable()
 
 }

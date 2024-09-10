@@ -8,7 +8,7 @@ plugins {
     id("io.ktor.plugin") version "2.3.11"
 }
 
-group = "translate.transf.com"
+group = "com.trans.translate"
 version = "0.0.1"
 
 application {

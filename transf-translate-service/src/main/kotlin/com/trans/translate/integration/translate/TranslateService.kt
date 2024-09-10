@@ -1,9 +1,9 @@
-package translate.transf.com.integration.translate
+package com.trans.translate.integration.translate
 
 import io.ktor.http.*
-import translate.transf.com.dto.TranslateRequest
-import translate.transf.com.dto.TranslateResponse
-import translate.transf.com.integration.client.HttpClientService
+import com.trans.translate.dto.TranslateRequest
+import com.trans.translate.dto.TranslateResponse
+import com.trans.translate.integration.client.HttpClientService
 
 public const val url = "https://api.lecto.ai/v1/translate/text"
 

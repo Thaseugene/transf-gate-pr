@@ -1,8 +1,6 @@
-package storage.trans.com.domain
+package com.trans.translate.dto
 
-import storage.trans.com.persistance.entity.MessageStatus
-
-data class TranslateMessageRequest(
+data class ProcessingMessageResponse(
     val requestId: String,
     val translatedValue: ByteArray? = null,
     val lang: String? = null,

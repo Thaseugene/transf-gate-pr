@@ -1,4 +1,4 @@
-package translate.transf.com.dto
+package com.trans.translate.dto
 
 enum class MessageStatus {
 

@@ -12,6 +12,8 @@ data class TelegramMessageRequest(
     val timeStamp: Long,
     val messageValue: ByteArray,
     val messageResult: ByteArray? = null,
+    val lang: String? = null,
+    val translatedResult: ByteArray? = null,
     val status: MessageStatus? = null,
     val userName: String? = null,
     var firstName: String? = null,

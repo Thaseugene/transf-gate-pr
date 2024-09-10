@@ -1,13 +1,12 @@
-package com.trans.service.mapping
+package storage.trans.com.service.mapping
 
-import io.ktor.utils.io.core.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import storage.trans.com.domain.*
+import storage.trans.com.exception.InnerException
 import storage.trans.com.persistance.entity.MessageEntity
 import storage.trans.com.persistance.entity.MessageStatus
 import java.time.ZoneOffset
 import java.util.*
-import kotlin.text.toByteArray
 
 fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
     this.userId = messageModel.userId
@@ -23,6 +22,7 @@ fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
     messageModel.translateResult?.let {
         this.translateResult = ExposedBlob(it)
     }
+    this.lang = messageModel.lang
     return messageModel.copy(
         id = this.id.value
     )
@@ -38,6 +38,7 @@ fun MessageEntity.toMessageModel() = MessageModel(
     this.messageValue.bytes,
     this.messageResult?.bytes,
     this.translateResult?.bytes,
+    this.lang,
     this.status
 )
 
@@ -48,7 +49,7 @@ fun MessageModel.updateTranscriptFields(incomingMessage: TranscriptMessageReques
 }
 
 fun MessageModel.updateTranslateFields(incomingMessage: TranslateMessageRequest): MessageModel {
-    this.translateResult = Base64.getEncoder().encode(incomingMessage.translatedValue?.toByteArray())
+    this.translateResult = incomingMessage.translatedValue
     this.status = incomingMessage.status
     return this
 }
@@ -61,6 +62,7 @@ fun TelegramMessageRequest.toMessageModel() = MessageModel(
     this.messageId,
     this.timeStamp,
     this.messageValue,
+    lang = this.lang,
     status = MessageStatus.NEW
 )
 
@@ -72,7 +74,7 @@ fun TelegramMessageRequest.toUserModel() = UserModel(
     this.lastName
 )
 
-fun MessageModel.toTranscriptResponse() =  TranscriptionMessageResponse(
+fun MessageModel.toTranscriptResponse() = TranscriptionMessageResponse(
     this.requestId,
     this.messageValue
 )
@@ -92,4 +94,17 @@ fun MessageModel.toTelegramTranslateResponse(result: String) = TelegramMessageRe
     translatedResult = result,
     status = this.status ?: MessageStatus.ERROR
 )
+
+fun TelegramMessageRequest.toTranslateMessageResponse(valueToTranslate: ByteArray) = TranslateMessageResponse(
+    this.requestId,
+    valueToTranslate,
+    this.lang ?: throw InnerException("Language isn't presented in incoming message")
+)
+
+fun ByteArray?.decode(): String {
+    return if (this == null)
+        throw InnerException("Couldn't decode value from Base64") else
+        Base64.getDecoder().decode(this).decodeToString()
+}
+
 

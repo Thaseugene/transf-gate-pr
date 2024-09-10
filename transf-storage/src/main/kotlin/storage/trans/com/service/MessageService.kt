@@ -1,8 +1,6 @@
 package storage.trans.com.service
 
-import storage.trans.com.exception.InnerException
 import com.trans.exception.RepositoryException
-import com.trans.service.mapping.*
 import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import org.slf4j.Logger
@@ -11,11 +9,12 @@ import storage.trans.com.domain.*
 import storage.trans.com.persistance.MessageRepository
 import storage.trans.com.persistance.UserRepository
 import storage.trans.com.persistance.entity.MessageStatus
+import storage.trans.com.service.mapping.*
 
 
 interface MessageService {
 
-    fun processIncomingMessage(incomingMessage: TelegramMessageRequest)
+    fun processIncomingMessage(incomingMessage: TelegramMessageRequest, requestId: String)
     fun processIncomingTranscriptMessage(incomingMessage: TranscriptMessageRequest)
     fun processIncomingTranslateMessage(incomingMessage: TranslateMessageRequest)
     fun updateEvent(event: MessageModel): MessageModel
@@ -31,7 +30,75 @@ class MessageServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(MessageService::class.java)
 
-    override fun processIncomingMessage(incomingMessage: TelegramMessageRequest) {
+    override fun processIncomingMessage(incomingMessage: TelegramMessageRequest, requestId: String) {
+        when (incomingMessage.lang) {
+            null -> processFirstTelegramMessage(incomingMessage)
+            else -> processTranslateTelegramMessage(incomingMessage, requestId)
+        }
+    }
+
+    override fun processIncomingTranscriptMessage(incomingMessage: TranscriptMessageRequest) {
+        try {
+            messageRepository.findByRequestId(incomingMessage.requestId)?.let {
+                messageRepository.update(
+                    it.updateTranscriptFields(incomingMessage)
+                )
+                producingProvider.prepareMessageToSend(
+                    incomingMessage.requestId,
+                    it.toTelegramResponse(incomingMessage.messageResult),
+                    SenderType.TELEGRAM_SENDER
+                )
+            }
+        } catch (ex: Exception) {
+            logger.error(
+                "Exception occurred while while processing message with requestId - " +
+                        "${incomingMessage.requestId} from transcription service", ex
+            )
+            producingProvider.prepareMessageToSend(
+                incomingMessage.requestId,
+                TelegramMessageResponse(status = MessageStatus.ERROR),
+                SenderType.TELEGRAM_SENDER
+            )
+        }
+    }
+
+    override fun processIncomingTranslateMessage(incomingMessage: TranslateMessageRequest) {
+        try {
+            val existingMessage = messageRepository.findByRequestId(incomingMessage.requestId)
+            existingMessage?.let {
+                it.updateTranslateFields(incomingMessage)
+                producingProvider.prepareMessageToSend(
+                    incomingMessage.requestId,
+                    messageRepository.update(it).toTelegramTranslateResponse(
+                        incomingMessage.translatedValue.decode()
+                    ),
+                    SenderType.TELEGRAM_SENDER
+                )
+            }
+        } catch (ex: Exception) {
+            logger.error(
+                "Exception occurred while while processing message with requestId - " +
+                        "${incomingMessage.requestId} from translation service", ex
+            )
+            producingProvider.prepareMessageToSend(
+                incomingMessage.requestId,
+                TelegramMessageResponse(status = MessageStatus.ERROR),
+                SenderType.TELEGRAM_SENDER
+            )
+        }
+    }
+
+
+    override fun updateEvent(event: MessageModel): MessageModel {
+        logger.info("Start updating process of event model - $event")
+        return messageRepository.update(event)
+    }
+
+    override fun findMessageById(id: Long): MessageModel {
+        return messageRepository.findById(id)
+    }
+
+    private fun processFirstTelegramMessage(incomingMessage: TelegramMessageRequest) {
         try {
             if (userRepository.checkIsUserPresented(incomingMessage.userId)) {
                 userRepository.save(incomingMessage.toUserModel())
@@ -55,66 +122,32 @@ class MessageServiceImpl(
         }
     }
 
-    override fun processIncomingTranscriptMessage(incomingMessage: TranscriptMessageRequest) {
+    private fun processTranslateTelegramMessage(incomingMessage: TelegramMessageRequest, requestId: String) {
         try {
-            val updatedMessage = messageRepository.update(
-                messageRepository.findByRequestId(incomingMessage.requestId)
-                    .updateTranscriptFields(incomingMessage)
-            )
-            val result = incomingMessage.messageResult
-            producingProvider.prepareMessageToSend(
-                incomingMessage.requestId,
-                updatedMessage.toTelegramResponse(result),
-                SenderType.TELEGRAM_SENDER
-            )
-        } catch (ex: Exception) {
-            logger.error(
-                "Exception occurred while while processing message with requestId - " +
-                        "${incomingMessage.requestId} from transcription service", ex
-            )
+            messageRepository.findByRequestId(requestId)?.let { message ->
+                if (message.translateResult != null && message.lang?.equals(incomingMessage.lang) == true) {
+                    producingProvider.prepareMessageToSend(
+                        incomingMessage.requestId,
+                        message.toTelegramTranslateResponse("Translated result has been sent to you before"),
+                        SenderType.TELEGRAM_SENDER
+                    )
+                    return
+                }
+                message.messageResult?.let { result ->
+                    producingProvider.prepareMessageToSend(
+                        incomingMessage.requestId,
+                        incomingMessage.toTranslateMessageResponse(result),
+                        SenderType.TRANSLATE_SENDER
+                    )
+                }
+            }
+        } catch (ex: RepositoryException) {
             producingProvider.prepareMessageToSend(
                 incomingMessage.requestId,
                 TelegramMessageResponse(status = MessageStatus.ERROR),
                 SenderType.TELEGRAM_SENDER
             )
         }
-    }
-
-    override fun processIncomingTranslateMessage(incomingMessage: TranslateMessageRequest) {
-        try {
-            val updatedMessage = messageRepository.update(
-                messageRepository.findByRequestId(incomingMessage.requestId)
-                    .updateTranslateFields(incomingMessage)
-            )
-            val result = incomingMessage.translatedValue
-            producingProvider.prepareMessageToSend(
-                incomingMessage.requestId,
-                updatedMessage.toTelegramTranslateResponse(
-                    result ?: throw InnerException("Value result wasn't found in response")
-                ),
-                SenderType.TELEGRAM_SENDER
-            )
-        } catch (ex: Exception) {
-            logger.error(
-                "Exception occurred while while processing message with requestId - " +
-                        "${incomingMessage.requestId} from translation service", ex
-            )
-            producingProvider.prepareMessageToSend(
-                incomingMessage.requestId,
-                TelegramMessageResponse(status = MessageStatus.ERROR),
-                SenderType.TELEGRAM_SENDER
-            )
-        }
-    }
-
-
-    override fun updateEvent(event: MessageModel): MessageModel {
-        logger.info("Start updating process of event model - $event")
-        return messageRepository.update(event)
-    }
-
-    override fun findMessageById(id: Long): MessageModel {
-        return messageRepository.findById(id)
     }
 
 }

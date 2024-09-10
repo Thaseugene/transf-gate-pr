@@ -1,4 +1,4 @@
-package translate.transf.com.service.processing
+package com.trans.translate.service.processing
 
 import com.transf.kafka.messaging.service.MessageHandler
 import com.transf.kafka.messaging.service.type.HandlerType
@@ -8,8 +8,8 @@ import kotlinx.coroutines.launch
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import translate.transf.com.dto.ProcessingMessageRequest
-import translate.transf.com.service.MessageService
+import com.trans.translate.dto.ProcessingMessageRequest
+import com.trans.translate.service.MessageService
 
 class ProcessingMessageHandler (
     private val dispatcher: CoroutineDispatcher,

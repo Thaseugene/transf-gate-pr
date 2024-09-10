@@ -31,7 +31,7 @@ val storageService = module {
             TelegramMessageHandler(get()), TranscriptMessageHandler(get()), TranslateMessageHandler(get())
         )
     }
-    single<HandlerProvider> { HandlerProviderImpl(get()) }
+    single<HandlerProvider> { HandlerProviderImpl(get(named("handlers"))) }
     single<ConsumingProvider> { ConsumingProviderImpl(get(), get()) }
 
 }

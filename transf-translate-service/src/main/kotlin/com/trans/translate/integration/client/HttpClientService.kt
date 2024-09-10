@@ -1,4 +1,4 @@
-package translate.transf.com.integration.client
+package com.trans.translate.integration.client
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import io.ktor.client.*

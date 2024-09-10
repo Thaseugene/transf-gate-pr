@@ -19,6 +19,7 @@ data class MessageModel(
     val messageValue: ByteArray,
     var messageResult: ByteArray? = null,
     var translateResult: ByteArray? = null,
+    var lang: String? = null,
     var status: MessageStatus? = null
 ) {
 

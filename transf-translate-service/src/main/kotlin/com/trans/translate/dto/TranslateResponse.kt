@@ -1,4 +1,4 @@
-package translate.transf.com.dto
+package com.trans.translate.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable

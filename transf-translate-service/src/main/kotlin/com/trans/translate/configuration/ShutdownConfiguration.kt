@@ -1,4 +1,4 @@
-package translate.transf.com.configuration
+package com.trans.translate.configuration
 
 import com.transf.kafka.messaging.service.ConsumingProvider
 import com.transf.kafka.messaging.service.ProducingProvider

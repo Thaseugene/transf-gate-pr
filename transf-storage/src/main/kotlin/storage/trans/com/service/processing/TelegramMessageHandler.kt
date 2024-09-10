@@ -16,7 +16,7 @@ class TelegramMessageHandler(
 
     override fun handleMessage(message: ConsumerRecord<String, TelegramMessageRequest>) {
         logger.info("Message -> ${message.value()}")
-        messageService.processIncomingMessage(message.value())
+        messageService.processIncomingMessage(message.value(), message.key())
     }
 
     override fun getType() = HandlerType.TELEGRAM_HANDLER

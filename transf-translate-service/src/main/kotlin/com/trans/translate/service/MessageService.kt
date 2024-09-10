@@ -1,17 +1,17 @@
-package translate.transf.com.service
+package com.trans.translate.service
 
 import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import translate.transf.com.dto.MessageStatus
-import translate.transf.com.dto.ProcessingMessageRequest
-import translate.transf.com.dto.ProcessingMessageResponse
-import translate.transf.com.integration.client.HttpClientService
-import translate.transf.com.integration.translate.TranslateService
-import translate.transf.com.integration.translate.TranslateServiceImpl
-import translate.transf.com.service.mapping.toProcessingResponse
-import translate.transf.com.service.mapping.toTranslateMessage
+import com.trans.translate.dto.MessageStatus
+import com.trans.translate.dto.ProcessingMessageRequest
+import com.trans.translate.dto.ProcessingMessageResponse
+import com.trans.translate.integration.client.HttpClientService
+import com.trans.translate.integration.translate.TranslateService
+import com.trans.translate.integration.translate.TranslateServiceImpl
+import com.trans.translate.service.mapping.toProcessingResponse
+import com.trans.translate.service.mapping.toTranslateMessage
 
 interface MessageService {
 
@@ -33,7 +33,7 @@ class MessageServiceImpl(
             val translatedResult = translateService.prepareTranslation(message.toTranslateMessage())
             producingProvider.prepareMessageToSend(
                 message.requestId,
-                translatedResult.toProcessingResponse(message.requestId),
+                translatedResult.toProcessingResponse(message.requestId, message.lang),
                 SenderType.PROCESSING_SENDER
             )
         } catch (ex: Exception) {
