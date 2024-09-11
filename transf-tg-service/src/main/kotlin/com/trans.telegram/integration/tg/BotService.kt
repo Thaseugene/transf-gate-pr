@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.trans.telegram.model.*
-import com.trans.telegram.model.request.ProcessingMessageRequest
+import com.trans.telegram.configuration.BotConfiguration
+import com.trans.telegram.model.CallbackCommand
+import com.trans.telegram.model.CommandType
+import com.trans.telegram.model.LanguageType
 import com.trans.telegram.service.MessageService
 import com.trans.telegram.service.cache.CacheService
+import com.transf.kafka.messaging.common.model.request.TelegramMessageRequest
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
 import dev.inmo.tgbotapi.extensions.api.send.*
@@ -53,7 +56,7 @@ class BotService(
     private val cacheService: CacheService
 ) {
 
-    private val tgBot = telegramBot(System.getenv("botToken"))
+    private val tgBot = telegramBot(BotConfiguration.BOT_TOKEN)
 
     private val downloadFilePath = "https://api.telegram.org/file/bot%s/%s"
 
@@ -73,7 +76,6 @@ class BotService(
     private suspend fun launchMessageListener() {
         tgBot.buildBehaviourWithLongPolling {
             onCommand("start") {
-                println(objectMapper.writeValueAsString(it))
                 reply(it, "Please, send me some audio or voice message, and I'll make transcription =)")
             }
             onMedia(initialFilter = null) { commonMessage ->
@@ -125,7 +127,7 @@ class BotService(
     }
 
     suspend fun sendErrorMessage(requestId: String) {
-        cacheService.retrieveCachedValue<ProcessingMessageRequest>(requestId)?.let {
+        cacheService.retrieveCachedValue<TelegramMessageRequest>(requestId)?.let {
             sendAnswer("Something went wrong, please try later...", it.chatId, it.messageId)
         }
     }
@@ -141,8 +143,6 @@ class BotService(
             previousRequestId,
             CommandType.TRANSLATE
         )
-
-        logger.info("Commands -> $noCommand, $yesCommand")
         val callBackList = listOf(
             listOf(
                 CallbackDataInlineKeyboardButton(
@@ -155,7 +155,6 @@ class BotService(
                 ),
             )
         )
-        callBackList[0].forEach { command -> logger.info("Command! -> ${command.copy()}") }
         tgBot.sendMessage(
             replyParams.chatIdentifier,
             "Is translation required?",
@@ -170,16 +169,16 @@ class BotService(
     }
 
     private suspend fun sendLangChooseMessage(chatId: ChatId, previousRequestId: String) {
-        val keysList = listOf(Language.values().map { lang ->
+        val keysList = listOf(LanguageType.entries.map { lang ->
             CallbackDataInlineKeyboardButton(
                 lang.name,
-                "${CommandType.LANG}:${lang.lang}:$previousRequestId"
+                "${lang.langName}:${lang.shortcut}:$previousRequestId"
             )
         }.toList())
 
         tgBot.sendMessage(
             chatId,
-            "Choose a lang",
+            "Choose a language",
             replyMarkup = InlineKeyboardMarkup(
                 keyboard = keysList
             )

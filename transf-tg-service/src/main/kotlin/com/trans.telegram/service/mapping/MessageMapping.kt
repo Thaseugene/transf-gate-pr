@@ -1,7 +1,8 @@
 package com.trans.telegram.service.mapping
 
-import com.trans.telegram.model.MessageStatus
-import com.trans.telegram.model.request.ProcessingMessageRequest
+import com.transf.kafka.messaging.common.model.MessageStatus
+import com.transf.kafka.messaging.common.model.request.CommandStrategy
+import com.transf.kafka.messaging.common.model.request.TelegramMessageRequest
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.MediaContent
@@ -9,7 +10,12 @@ import dev.inmo.tgbotapi.types.queries.callback.MessageDataCallbackQuery
 import java.util.*
 
 
-fun ContentMessage<MediaContent>.toProcessingMessage(messageValue: String) = ProcessingMessageRequest(
+fun ContentMessage<MediaContent>.toProcessingMessage(
+    messageValue: String,
+    commandStrategy: CommandStrategy
+) =
+    TelegramMessageRequest(
+        commandStrategy,
         this.chat.id.chatId.long,
         UUID.randomUUID().toString(),
         this.chat.id.chatId.long,
@@ -22,7 +28,12 @@ fun ContentMessage<MediaContent>.toProcessingMessage(messageValue: String) = Pro
         lastName = this.from?.lastName
     )
 
-fun MessageDataCallbackQuery.toProcessingMessage(requestId: String, lang: String) = ProcessingMessageRequest(
+fun MessageDataCallbackQuery.toProcessingMessage(
+    requestId: String,
+    lang: String,
+    commandStrategy: CommandStrategy
+) = TelegramMessageRequest(
+    commandStrategy,
     this.from.id.chatId.long,
     requestId,
     this.from.id.chatId.long,

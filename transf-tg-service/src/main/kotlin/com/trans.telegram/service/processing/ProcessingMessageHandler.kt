@@ -1,7 +1,6 @@
 package com.trans.telegram.service.processing
 
-import com.trans.telegram.model.MessageStatus
-import com.trans.telegram.model.response.ProcessingMessageResponse
+import com.trans.telegram.model.response.TelegramMessageResponse
 import com.trans.telegram.integration.tg.BotService
 import com.transf.kafka.messaging.service.MessageHandler
 import com.transf.kafka.messaging.service.type.HandlerType
@@ -15,11 +14,11 @@ import org.slf4j.LoggerFactory
 class ProcessingMessageHandler(
     private val botService: BotService,
     private val dispatcher: CoroutineDispatcher
-) : MessageHandler<ProcessingMessageResponse> {
+) : MessageHandler<TelegramMessageResponse> {
 
     private val logger: Logger = LoggerFactory.getLogger(ProcessingMessageHandler::class.java)
 
-    override fun handleMessage(message: ConsumerRecord<String, ProcessingMessageResponse>) {
+    override fun handleMessage(message: ConsumerRecord<String, TelegramMessageResponse>) {
         CoroutineScope(dispatcher).launch {
             message.value()?.let {
                 try {
