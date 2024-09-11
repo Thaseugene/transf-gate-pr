@@ -5,6 +5,7 @@ import com.transf.kafka.messaging.service.*
 import io.ktor.server.application.*
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.SLF4JLogger
@@ -26,11 +27,7 @@ val storageService = module {
     single<UserRepository> { UserRepositoryImpl() }
     single<MessageRepository> { MessageRepositoryImpl() }
     single<MessageService> { MessageServiceImpl(get(), get(), get()) }
-    single(named("handlers")) {
-        listOf(
-            TelegramMessageHandler(get()), TranscriptMessageHandler(get()), TranslateMessageHandler(get())
-        )
-    }
+    single(named("handlers")) { prepareHandlers() }
     single<HandlerProvider> { HandlerProviderImpl(get(named("handlers"))) }
     single<ConsumingProvider> { ConsumingProviderImpl(get(), get()) }
 
@@ -41,5 +38,10 @@ fun Application.configureDependencies() {
         SLF4JLogger()
         modules(storageService)
     }
-
 }
+
+private fun Scope.prepareHandlers() = listOf(
+    TelegramMessageHandler(get()),
+    TranscriptMessageHandler(get()),
+    TranslateMessageHandler(get()),
+)

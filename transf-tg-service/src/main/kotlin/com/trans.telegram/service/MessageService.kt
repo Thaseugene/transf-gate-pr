@@ -6,6 +6,7 @@ import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.MediaContent
+import dev.inmo.tgbotapi.types.queries.callback.MessageDataCallbackQuery
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory
 interface MessageService {
 
     fun processTelegramMessage(incomingMessage: ContentMessage<MediaContent>, downloadFilePath: String)
+
+    fun processTranslateMessage(incomingMessage: MessageDataCallbackQuery, lang: String, requestId: String)
 
 }
 
@@ -40,6 +43,21 @@ class MessageServiceImpl(
             CoroutineScope(dispatcher).launch {
                 cacheService.insertCacheData(it.requestId, it)
             }
+        }
+    }
+
+    override fun processTranslateMessage(
+        incomingMessage: MessageDataCallbackQuery,
+        lang: String,
+        requestId: String
+    ) {
+        logger.info("Preparing incoming message from user -> ${incomingMessage.from.id.chatId.long}")
+        incomingMessage.toProcessingMessage(requestId, lang).also {
+            producingProvider.prepareMessageToSend(
+                it.requestId,
+                it,
+                SenderType.PROCESSING_SENDER
+            )
         }
     }
 

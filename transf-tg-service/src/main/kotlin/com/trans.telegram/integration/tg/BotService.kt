@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.trans.telegram.domain.CallbackCommand
-import com.trans.telegram.domain.CommandType
-import com.trans.telegram.domain.ProcessingMessageRequest
+import com.trans.telegram.model.*
+import com.trans.telegram.model.request.ProcessingMessageRequest
 import com.trans.telegram.service.MessageService
 import com.trans.telegram.service.cache.CacheService
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
-import dev.inmo.tgbotapi.extensions.api.answers.answerCallbackQuery
 import dev.inmo.tgbotapi.extensions.api.get.getFileAdditionalInfo
 import dev.inmo.tgbotapi.extensions.api.send.*
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
@@ -85,14 +83,19 @@ class BotService(
                 reply(it, "Please, send me some audio or voice message, and I'll make transcription =)")
             }
             onDataCallbackQuery { dataCallbackQuery: DataCallbackQuery ->
-                val command = CommandType.valueOf(dataCallbackQuery.data.split(":").first())
-                answerCallbackQuery(dataCallbackQuery)
-                if (dataCallbackQuery is MessageDataCallbackQuery) {
-                    logger.info("Callback data ----> ${jacksonObjectMapper().writeValueAsString(dataCallbackQuery)}")
-                }
-                when (command) {
-                    CommandType.TRANSLATE -> send(dataCallbackQuery.from.id, "Okay wait a little...")
+                val callBackResult = dataCallbackQuery.data.split(":");
+                val commandType = CommandType.valueOf(callBackResult.first())
+                when (commandType) {
+                    CommandType.TRANSLATE -> sendLangChooseMessage(dataCallbackQuery.from.id, callBackResult[1])
                     CommandType.NOT_TRANSLATE -> send(dataCallbackQuery.from.id, "Okay =)")
+                    CommandType.LANG -> {
+                        val lang = callBackResult[1]
+                        val requestId = callBackResult[2]
+                        if (dataCallbackQuery is MessageDataCallbackQuery) {
+                            messageService.processTranslateMessage(dataCallbackQuery, lang, requestId)
+                        }
+                    }
+
                 }
             }
         }.join()
@@ -140,28 +143,47 @@ class BotService(
         )
 
         logger.info("Commands -> $noCommand, $yesCommand")
+        val callBackList = listOf(
+            listOf(
+                CallbackDataInlineKeyboardButton(
+                    "Yes",
+                    "${yesCommand.command}:${yesCommand.requestId}"
+                ),
+                CallbackDataInlineKeyboardButton(
+                    "No",
+                    "${noCommand.command}:${noCommand.requestId}"
+                ),
+            )
+        )
+        callBackList[0].forEach { command -> logger.info("Command! -> ${command.copy()}") }
         tgBot.sendMessage(
             replyParams.chatIdentifier,
             "Is translation required?",
             replyMarkup = InlineKeyboardMarkup(
-                keyboard = listOf(
-                    listOf(
-                        CallbackDataInlineKeyboardButton(
-                            "Off course, goddamn!!!",
-                            "${yesCommand.command}:${yesCommand.requestId}"
-                        ),
-                        CallbackDataInlineKeyboardButton(
-                            "No",
-                            "${noCommand.command}:${noCommand.requestId}"
-                        ),
-                    )
-                )
+                keyboard = callBackList
             )
         )
     }
 
-    suspend fun sendLangChooseMessage(chatId: Long, previousRequestId: String) {
+    suspend fun sendSuccessTranslateMessage(answer: String, chatId: Long, messageId: Long) {
+        sendAnswer(answer, chatId, messageId)
+    }
 
+    private suspend fun sendLangChooseMessage(chatId: ChatId, previousRequestId: String) {
+        val keysList = listOf(Language.values().map { lang ->
+            CallbackDataInlineKeyboardButton(
+                lang.name,
+                "${CommandType.LANG}:${lang.lang}:$previousRequestId"
+            )
+        }.toList())
+
+        tgBot.sendMessage(
+            chatId,
+            "Choose a lang",
+            replyMarkup = InlineKeyboardMarkup(
+                keyboard = keysList
+            )
+        )
     }
 
     private suspend fun sendAnswer(answer: String, chatId: Long, messageId: Long) {

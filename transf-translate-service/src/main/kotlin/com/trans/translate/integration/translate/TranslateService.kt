@@ -1,8 +1,8 @@
 package com.trans.translate.integration.translate
 
 import io.ktor.http.*
-import com.trans.translate.dto.TranslateRequest
-import com.trans.translate.dto.TranslateResponse
+import com.trans.translate.model.request.TranslateRequest
+import com.trans.translate.model.response.TranslateResponse
 import com.trans.translate.integration.client.HttpClientService
 
 public const val url = "https://api.lecto.ai/v1/translate/text"
@@ -32,7 +32,13 @@ class TranslateServiceImpl(
             ContentType.Application.Json,
             messageToTranslate
         )
-        return response.translations.first().translated.first()
+        response.translations?.let {
+            return it[0].translated.first()
+        }
+        response.details?.let {
+            return it.texts ?: throw RuntimeException()
+        }
+        throw RuntimeException()
     }
 
 }

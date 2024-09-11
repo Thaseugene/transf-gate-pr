@@ -1,6 +1,6 @@
 package storage.trans.com.service.mapping
 
-import storage.trans.com.domain.UserModel
+import storage.trans.com.model.UserModel
 import storage.trans.com.persistance.entity.UserEntity
 
 fun UserEntity.toUserModel() = UserModel(

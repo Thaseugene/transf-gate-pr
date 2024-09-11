@@ -1,17 +1,15 @@
 package com.trans.telegram.service.mapping
 
-import com.trans.telegram.domain.MessageStatus
-import com.trans.telegram.domain.ProcessingMessageRequest
-import com.trans.telegram.domain.ProcessingMessageResponse
+import com.trans.telegram.model.MessageStatus
+import com.trans.telegram.model.request.ProcessingMessageRequest
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.MediaContent
+import dev.inmo.tgbotapi.types.queries.callback.MessageDataCallbackQuery
 import java.util.*
-import kotlin.reflect.full.memberFunctions
 
 
-fun ContentMessage<MediaContent>.toProcessingMessage(messageValue: String): ProcessingMessageRequest =
-    ProcessingMessageRequest(
+fun ContentMessage<MediaContent>.toProcessingMessage(messageValue: String) = ProcessingMessageRequest(
         this.chat.id.chatId.long,
         UUID.randomUUID().toString(),
         this.chat.id.chatId.long,
@@ -24,13 +22,12 @@ fun ContentMessage<MediaContent>.toProcessingMessage(messageValue: String): Proc
         lastName = this.from?.lastName
     )
 
-fun ProcessingMessageResponse.validate(): Boolean {
-    val components = this::class.memberFunctions
-        .filter { it.name.startsWith("component") && it.parameters.size == 1 }
-        .sortedBy { it.name }
-
-    return components.all { component ->
-        val value = component.call(this)
-        value != null
-    }
-}
+fun MessageDataCallbackQuery.toProcessingMessage(requestId: String, lang: String) = ProcessingMessageRequest(
+    this.from.id.chatId.long,
+    requestId,
+    this.from.id.chatId.long,
+    this.message.messageId.long,
+    System.currentTimeMillis(),
+    "XXX".encodeToByteArray(),
+    lang = lang
+)

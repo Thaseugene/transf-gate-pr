@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import storage.trans.com.domain.UserModel
+import storage.trans.com.model.UserModel
 import storage.trans.com.exception.ExpCode
 import storage.trans.com.persistance.entity.UserEntity
 import storage.trans.com.persistance.entity.UserTable

@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
-import storage.trans.com.domain.MessageModel
+import storage.trans.com.model.MessageModel
 import storage.trans.com.persistance.entity.MessageEntity
 import storage.trans.com.persistance.entity.MessageTable
 

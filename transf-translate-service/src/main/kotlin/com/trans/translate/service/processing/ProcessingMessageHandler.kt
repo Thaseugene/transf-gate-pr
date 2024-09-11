@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import com.trans.translate.dto.ProcessingMessageRequest
+import com.trans.translate.model.request.ProcessingMessageRequest
 import com.trans.translate.service.MessageService
 
 class ProcessingMessageHandler (

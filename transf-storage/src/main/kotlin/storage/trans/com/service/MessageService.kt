@@ -1,11 +1,15 @@
 package storage.trans.com.service
 
-import com.trans.exception.RepositoryException
 import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import storage.trans.com.domain.*
+import storage.trans.com.model.*
+import storage.trans.com.model.request.CommandStrategy
+import storage.trans.com.model.request.TelegramMessageRequest
+import storage.trans.com.model.request.TranscriptMessageRequest
+import storage.trans.com.model.request.TranslateMessageRequest
+import storage.trans.com.model.response.TelegramMessageResponse
 import storage.trans.com.persistance.MessageRepository
 import storage.trans.com.persistance.UserRepository
 import storage.trans.com.persistance.entity.MessageStatus
@@ -31,9 +35,9 @@ class MessageServiceImpl(
     private val logger: Logger = LoggerFactory.getLogger(MessageService::class.java)
 
     override fun processIncomingMessage(incomingMessage: TelegramMessageRequest, requestId: String) {
-        when (incomingMessage.lang) {
-            null -> processFirstTelegramMessage(incomingMessage)
-            else -> processTranslateTelegramMessage(incomingMessage, requestId)
+        when (incomingMessage.executionStrategy) {
+            CommandStrategy.TRANSCRIPTION -> processMessageForTranscript(incomingMessage)
+            CommandStrategy.TRANSLATION -> processMessageForTranslate(incomingMessage, requestId)
         }
     }
 
@@ -98,7 +102,7 @@ class MessageServiceImpl(
         return messageRepository.findById(id)
     }
 
-    private fun processFirstTelegramMessage(incomingMessage: TelegramMessageRequest) {
+    private fun processMessageForTranscript(incomingMessage: TelegramMessageRequest) {
         try {
             if (userRepository.checkIsUserPresented(incomingMessage.userId)) {
                 userRepository.save(incomingMessage.toUserModel())
@@ -109,7 +113,7 @@ class MessageServiceImpl(
                 savedMessage.toTranscriptResponse(),
                 SenderType.TRANSCRIPT_SENDER
             )
-        } catch (ex: RepositoryException) {
+        } catch (ex: Exception) {
             logger.error(
                 "Error occurred while processing incoming message with requestId - " +
                         incomingMessage.requestId, ex
@@ -122,7 +126,7 @@ class MessageServiceImpl(
         }
     }
 
-    private fun processTranslateTelegramMessage(incomingMessage: TelegramMessageRequest, requestId: String) {
+    private fun processMessageForTranslate(incomingMessage: TelegramMessageRequest, requestId: String) {
         try {
             messageRepository.findByRequestId(requestId)?.let { message ->
                 if (message.translateResult != null && message.lang?.equals(incomingMessage.lang) == true) {
@@ -141,7 +145,7 @@ class MessageServiceImpl(
                     )
                 }
             }
-        } catch (ex: RepositoryException) {
+        } catch (ex: Exception) {
             producingProvider.prepareMessageToSend(
                 incomingMessage.requestId,
                 TelegramMessageResponse(status = MessageStatus.ERROR),
@@ -149,6 +153,5 @@ class MessageServiceImpl(
             )
         }
     }
-
 }
 

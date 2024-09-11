@@ -4,12 +4,10 @@ import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import com.trans.translate.dto.MessageStatus
-import com.trans.translate.dto.ProcessingMessageRequest
-import com.trans.translate.dto.ProcessingMessageResponse
-import com.trans.translate.integration.client.HttpClientService
+import com.trans.translate.model.MessageStatus
+import com.trans.translate.model.request.ProcessingMessageRequest
+import com.trans.translate.model.response.ProcessingMessageResponse
 import com.trans.translate.integration.translate.TranslateService
-import com.trans.translate.integration.translate.TranslateServiceImpl
 import com.trans.translate.service.mapping.toProcessingResponse
 import com.trans.translate.service.mapping.toTranslateMessage
 

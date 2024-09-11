@@ -1,9 +1,9 @@
 package com.trans.transcript.integration.transacription
 
-import com.trans.transcript.dto.PollingResponse
-import com.trans.transcript.dto.TranscriptRequest
-import com.trans.transcript.dto.TranscriptResponse
-import com.trans.transcript.dto.UploadResponse
+import com.trans.transcript.model.response.PollingResponse
+import com.trans.transcript.model.request.TranscriptRequest
+import com.trans.transcript.model.response.TranscriptResponse
+import com.trans.transcript.model.response.UploadResponse
 import com.trans.transcript.exception.TranscriptionExternalException
 import com.trans.transcript.integration.client.HttpClientService
 import io.ktor.http.*

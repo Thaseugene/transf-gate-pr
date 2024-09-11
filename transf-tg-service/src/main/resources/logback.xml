@@ -13,6 +13,6 @@
     <logger name="org.apache.kafka" level="WARN"/>
     <logger name="org.jetbrains.exposed" level="ALL"/>
     <logger name="io.insert-koin" level="ALL"/>
-    <logger name="dev.inmo.tgbotapi" level="INFO"/>
+    <logger name="dev.inmo.tgbotapi" level="ALL"/>
 
 </configuration>
