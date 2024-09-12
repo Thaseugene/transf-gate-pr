@@ -1,16 +1,16 @@
 package storage.trans.com.service.mapping
 
+import com.transf.kafka.messaging.common.model.MessageStatus
+import com.transf.kafka.messaging.common.model.request.TelegramMessageRequest
+import com.transf.kafka.messaging.common.model.request.TranscriptionMessageRequest
+import com.transf.kafka.messaging.common.model.request.TranslateMessageRequest
+import com.transf.kafka.messaging.common.model.response.TelegramMessageResponse
+import com.transf.kafka.messaging.common.model.response.TranscriptionMessageResponse
+import com.transf.kafka.messaging.common.model.response.TranslateMessageResponse
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import storage.trans.com.model.*
 import storage.trans.com.exception.InnerException
-import storage.trans.com.model.request.TelegramMessageRequest
-import storage.trans.com.model.request.TranscriptMessageRequest
-import storage.trans.com.model.request.TranslateMessageRequest
-import storage.trans.com.model.response.TelegramMessageResponse
-import storage.trans.com.model.response.TranscriptionMessageResponse
-import storage.trans.com.model.response.TranslateMessageResponse
 import storage.trans.com.persistance.entity.MessageEntity
-import storage.trans.com.persistance.entity.MessageStatus
 import java.time.ZoneOffset
 import java.util.*
 
@@ -48,7 +48,7 @@ fun MessageEntity.toMessageModel() = MessageModel(
     this.status
 )
 
-fun MessageModel.updateTranscriptFields(incomingMessage: TranscriptMessageRequest): MessageModel {
+fun MessageModel.updateTranscriptFields(incomingMessage: TranscriptionMessageRequest): MessageModel {
     this.timeStamp = System.currentTimeMillis()
     this.messageResult = Base64.getEncoder().encode(incomingMessage.messageResult.toByteArray())
     this.status = incomingMessage.status

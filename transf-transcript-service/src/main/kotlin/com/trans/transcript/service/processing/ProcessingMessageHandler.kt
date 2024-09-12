@@ -1,8 +1,8 @@
 package com.trans.transcript.service.processing
 
-import com.trans.transcript.model.request.ProcessingMessageRequest
 import com.trans.transcript.integration.client.HttpClientService
 import com.trans.transcript.service.MessageService
+import com.transf.kafka.messaging.common.model.response.TranscriptionMessageResponse
 import com.transf.kafka.messaging.service.type.HandlerType
 import com.transf.kafka.messaging.service.MessageHandler
 import io.ktor.client.statement.*
@@ -19,11 +19,11 @@ class ProcessingMessageHandler(
     private val dispatcher: CoroutineDispatcher,
     private val messageService: MessageService,
     private val clientService: HttpClientService
-) : MessageHandler<ProcessingMessageRequest> {
+) : MessageHandler<TranscriptionMessageResponse> {
 
     private val logger: Logger = LoggerFactory.getLogger(ProcessingMessageHandler::class.java)
 
-    override fun handleMessage(message: ConsumerRecord<String, ProcessingMessageRequest>) {
+    override fun handleMessage(message: ConsumerRecord<String, TranscriptionMessageResponse>) {
         CoroutineScope(dispatcher).launch {
             message.value()?.let {
                 logger.info("Received Message -> ${message.value()}")

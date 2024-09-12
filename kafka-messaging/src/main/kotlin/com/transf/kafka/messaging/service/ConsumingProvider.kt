@@ -25,7 +25,7 @@ interface ConsumingProvider {
 class ConsumingProviderImpl(
     private val dispatcher: CoroutineDispatcher,
     private val handlerProvider: HandlerProvider
-): ConsumingProvider {
+) : ConsumingProvider {
 
     private val logger: Logger = LoggerFactory.getLogger(ConsumingProviderImpl::class.java)
 
@@ -52,7 +52,7 @@ class ConsumingProviderImpl(
         consumer.use { kafkaConsumer ->
             kafkaConsumer.subscribe(listOf(topicName))
             while (!isShutDown) {
-                try {
+                runCatching {
                     val records = kafkaConsumer.poll(java.time.Duration.ofSeconds(1))
                     for (record: ConsumerRecord<String, T> in records) {
                         logger.info("Consumed message from topic ${record.topic()}")
@@ -60,8 +60,8 @@ class ConsumingProviderImpl(
                             (it as MessageHandler<T>).handleMessage(record)
                         }
                     }
-                } catch (e: Exception) {
-                    logger.error("Error occurred while processing message from topic", e)
+                }.onFailure {
+                    logger.error("Error occurred while processing message from topic", it)
                 }
             }
             logger.info("Message consuming stopped")

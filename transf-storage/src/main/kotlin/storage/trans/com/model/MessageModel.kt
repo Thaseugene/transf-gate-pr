@@ -1,7 +1,7 @@
 package storage.trans.com.model
 
+import com.transf.kafka.messaging.common.model.MessageStatus
 import kotlinx.serialization.Serializable
-import storage.trans.com.persistance.entity.MessageStatus
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

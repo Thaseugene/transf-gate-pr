@@ -57,10 +57,8 @@ class MessageRepositoryImpl : MessageRepository {
 
     override fun findByChatId(chatId: Long): List<MessageModel> = transaction {
         val messageList = findBy(MessageTable.chatId, chatId).filterNotNull().map { it.toMessageModel() }
-        if (messageList.isEmpty()) {
+        if (messageList.isEmpty()) messageList else
             throw RepositoryException(ExpCode.NOT_FOUND, "Messages with chatId = $chatId doesn't exists")
-        }
-        messageList
     }
 
     override fun findByUserId(userId: Long): List<MessageModel> = transaction {

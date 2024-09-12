@@ -1,11 +1,12 @@
 package com.trans.transcript.integration.transacription
 
-import com.trans.transcript.model.response.PollingResponse
-import com.trans.transcript.model.request.TranscriptRequest
-import com.trans.transcript.model.response.TranscriptResponse
-import com.trans.transcript.model.response.UploadResponse
+import com.trans.transcript.configuration.TranscriptionConfiguration
 import com.trans.transcript.exception.TranscriptionExternalException
 import com.trans.transcript.integration.client.HttpClientService
+import com.trans.transcript.model.request.TranscriptRequest
+import com.trans.transcript.model.response.PollingResponse
+import com.trans.transcript.model.response.TranscriptResponse
+import com.trans.transcript.model.response.UploadResponse
 import io.ktor.http.*
 import kotlinx.coroutines.delay
 import org.slf4j.Logger
@@ -23,9 +24,7 @@ class TranscriptionServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(TranscriptionServiceImpl::class.java)
 
-    private val apiKey: String = System.getenv("apiKey");
-
-    private val authHeaders = mapOf("Authorization" to apiKey)
+    private val authHeaders = mapOf(HttpHeaders.Authorization to TranscriptionConfiguration.TRANSCRIPTION_API_TOKEN)
 
     override suspend fun tryToMakeTranscript(bytesToAnalyze: ByteArray): String {
         val uploadedFileUrl = uploadFile(bytesToAnalyze)

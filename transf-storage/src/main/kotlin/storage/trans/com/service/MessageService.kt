@@ -1,25 +1,22 @@
 package storage.trans.com.service
 
+import com.transf.kafka.messaging.common.model.MessageStatus
+import com.transf.kafka.messaging.common.model.request.*
+import com.transf.kafka.messaging.common.model.response.TelegramMessageResponse
 import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import storage.trans.com.model.*
-import storage.trans.com.model.request.CommandStrategy
-import storage.trans.com.model.request.TelegramMessageRequest
-import storage.trans.com.model.request.TranscriptMessageRequest
-import storage.trans.com.model.request.TranslateMessageRequest
-import storage.trans.com.model.response.TelegramMessageResponse
 import storage.trans.com.persistance.MessageRepository
 import storage.trans.com.persistance.UserRepository
-import storage.trans.com.persistance.entity.MessageStatus
 import storage.trans.com.service.mapping.*
 
 
 interface MessageService {
 
     fun processIncomingMessage(incomingMessage: TelegramMessageRequest, requestId: String)
-    fun processIncomingTranscriptMessage(incomingMessage: TranscriptMessageRequest)
+    fun processIncomingTranscriptMessage(incomingMessage: TranscriptionMessageRequest)
     fun processIncomingTranslateMessage(incomingMessage: TranslateMessageRequest)
     fun updateEvent(event: MessageModel): MessageModel
     fun findMessageById(id: Long): MessageModel
@@ -41,7 +38,7 @@ class MessageServiceImpl(
         }
     }
 
-    override fun processIncomingTranscriptMessage(incomingMessage: TranscriptMessageRequest) {
+    override fun processIncomingTranscriptMessage(incomingMessage: TranscriptionMessageRequest) {
         try {
             messageRepository.findByRequestId(incomingMessage.requestId)?.let {
                 messageRepository.update(

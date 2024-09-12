@@ -1,5 +1,6 @@
 package storage.trans.com.persistance.entity
 
+import com.transf.kafka.messaging.common.model.MessageStatus
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

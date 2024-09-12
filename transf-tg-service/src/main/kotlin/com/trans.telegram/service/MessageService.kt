@@ -2,6 +2,7 @@ package com.trans.telegram.service
 
 import com.trans.telegram.service.cache.CacheService
 import com.trans.telegram.service.mapping.toProcessingMessage
+import com.transf.kafka.messaging.common.model.request.CommandStrategy
 import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
@@ -34,7 +35,7 @@ class MessageServiceImpl(
         downloadFilePath: String
     ) {
         logger.info("Preparing incoming message from user -> ${incomingMessage.chat.id.chatId.long}")
-        incomingMessage.toProcessingMessage(downloadFilePath).also {
+        incomingMessage.toProcessingMessage(downloadFilePath, CommandStrategy.TRANSLATION).also {
             producingProvider.prepareMessageToSend(
                 it.requestId,
                 it,
@@ -52,7 +53,7 @@ class MessageServiceImpl(
         requestId: String
     ) {
         logger.info("Preparing incoming message from user -> ${incomingMessage.from.id.chatId.long}")
-        incomingMessage.toProcessingMessage(requestId, lang).also {
+        incomingMessage.toProcessingMessage(requestId, lang, CommandStrategy.TRANSCRIPTION).also {
             producingProvider.prepareMessageToSend(
                 it.requestId,
                 it,

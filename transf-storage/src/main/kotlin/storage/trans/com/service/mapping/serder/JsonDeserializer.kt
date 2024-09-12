@@ -19,6 +19,7 @@ class JsonDeserializer<T> : Deserializer<T> {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun configure(configs: Map<String, *>?, isKey: Boolean) {
         val typeValue = configs?.get("value.deserializer.type") as? Class<*>
         if (typeValue != null) {
