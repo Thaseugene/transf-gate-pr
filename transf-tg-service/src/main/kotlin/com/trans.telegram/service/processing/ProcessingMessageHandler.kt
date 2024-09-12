@@ -1,7 +1,8 @@
 package com.trans.telegram.service.processing
 
-import com.trans.telegram.model.response.TelegramMessageResponse
 import com.trans.telegram.integration.tg.BotService
+import com.transf.kafka.messaging.common.model.MessageStatus
+import com.transf.kafka.messaging.common.model.response.TelegramMessageResponse
 import com.transf.kafka.messaging.service.MessageHandler
 import com.transf.kafka.messaging.service.type.HandlerType
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,12 +24,12 @@ class ProcessingMessageHandler(
             message.value()?.let {
                 try {
                     logger.info("Handled message -> ${message.value()}")
-                    if (it.translatedResult != null && it.status != null && it.status.equals(MessageStatus.OK) && it.chatId != null && it.messageId != null) {
-                        botService.sendSuccessTranslateMessage(it.translatedResult, it.chatId, it.messageId)
+                    if (it.translatedResult != null && it.status == MessageStatus.OK && it.chatId != null && it.messageId != null) {
+                        botService.sendSuccessTranslateMessage(it.translatedResult!!, it.chatId!!, it.messageId!!)
                         return@launch;
                     }
-                    if (it.result != null && it.status != null && it.status.equals(MessageStatus.OK) && it.chatId != null && it.messageId != null) {
-                        botService.sendSuccessTranscriptMessage(it.result, it.chatId, it.messageId, message.key())
+                    if (it.result != null && it.status == MessageStatus.OK && it.chatId != null && it.messageId != null) {
+                        botService.sendSuccessTranscriptMessage(it.result!!, it.chatId!!, it.messageId!!, message.key())
                         return@launch;
                     }
                     botService.sendErrorMessage(message.key())

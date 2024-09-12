@@ -6,9 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.SLF4JLogger
-import com.trans.translate.integration.client.HttpClientService
-import com.trans.translate.integration.translate.TranslateService
-import com.trans.translate.integration.translate.TranslateServiceImpl
+import com.trans.translate.service.integration.client.HttpClientService
+import com.trans.translate.service.integration.translate.TranslateService
+import com.trans.translate.service.integration.translate.TranslateServiceImpl
 import com.trans.translate.service.HandlerProviderImpl
 import com.trans.translate.service.MessageService
 import com.trans.translate.service.MessageServiceImpl

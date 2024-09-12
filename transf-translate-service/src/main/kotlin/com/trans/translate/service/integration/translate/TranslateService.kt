@@ -1,11 +1,10 @@
-package com.trans.translate.integration.translate
+package com.trans.translate.service.integration.translate
 
+import com.trans.translate.configuration.TranslateConfiguration
 import io.ktor.http.*
 import com.trans.translate.model.request.TranslateRequest
 import com.trans.translate.model.response.TranslateResponse
-import com.trans.translate.integration.client.HttpClientService
-
-public const val url = "https://api.lecto.ai/v1/translate/text"
+import com.trans.translate.service.integration.client.HttpClientService
 
 interface TranslateService {
 
@@ -17,16 +16,14 @@ class TranslateServiceImpl(
     private val clientService: HttpClientService
 ) : TranslateService {
 
-    private val apiKey: String = System.getenv("apiKey");
-
     private val requiredHeaders = mapOf(
-        "X-API-Key" to apiKey,
-        "Accept" to "application/json"
+        "X-API-Key" to TranslateConfiguration.TRANSLATION_API_TOKEN,
+        HttpHeaders.Accept to "application/json"
     )
 
     override suspend fun prepareTranslation(messageToTranslate: TranslateRequest): String {
         val response = clientService.callHttpService<TranslateResponse>(
-            url,
+            TranslateConfiguration.API_URL,
             HttpMethod.Post,
             requiredHeaders,
             ContentType.Application.Json,

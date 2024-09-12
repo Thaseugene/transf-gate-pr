@@ -1,4 +1,4 @@
-package com.trans.transcript.integration.client
+package com.trans.translate.service.integration.client
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import io.ktor.client.*
@@ -22,9 +22,6 @@ class HttpClientService {
                 disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             }
         }
-//            engine {
-//                proxy = ProxyBuilder.socks("148.113.162.23", 63309)
-//            }
         install(HttpTimeout) {
             requestTimeoutMillis = 60000
             socketTimeoutMillis = 60000

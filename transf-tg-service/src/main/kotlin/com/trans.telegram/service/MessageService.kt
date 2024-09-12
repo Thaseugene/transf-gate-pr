@@ -35,7 +35,7 @@ class MessageServiceImpl(
         downloadFilePath: String
     ) {
         logger.info("Preparing incoming message from user -> ${incomingMessage.chat.id.chatId.long}")
-        incomingMessage.toProcessingMessage(downloadFilePath, CommandStrategy.TRANSLATION).also {
+        incomingMessage.toProcessingMessage(downloadFilePath, CommandStrategy.TRANSCRIPTION).also {
             producingProvider.prepareMessageToSend(
                 it.requestId,
                 it,
@@ -53,7 +53,7 @@ class MessageServiceImpl(
         requestId: String
     ) {
         logger.info("Preparing incoming message from user -> ${incomingMessage.from.id.chatId.long}")
-        incomingMessage.toProcessingMessage(requestId, lang, CommandStrategy.TRANSCRIPTION).also {
+        incomingMessage.toProcessingMessage(requestId, lang, CommandStrategy.TRANSLATION).also {
             producingProvider.prepareMessageToSend(
                 it.requestId,
                 it,

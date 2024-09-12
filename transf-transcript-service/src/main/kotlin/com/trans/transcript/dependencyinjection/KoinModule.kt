@@ -1,8 +1,8 @@
 package com.trans.transcript.dependencyinjection
 
-import com.trans.transcript.integration.client.HttpClientService
-import com.trans.transcript.integration.transacription.TranscriptionService
-import com.trans.transcript.integration.transacription.TranscriptionServiceImpl
+import com.trans.transcript.service.integration.client.HttpClientService
+import com.trans.transcript.service.integration.transacription.TranscriptionService
+import com.trans.transcript.service.integration.transacription.TranscriptionServiceImpl
 import com.trans.transcript.service.HandlerProviderImpl
 import com.trans.transcript.service.MessageService
 import com.trans.transcript.service.MessageServiceImpl

@@ -111,7 +111,7 @@ class BotService(
                     is VoiceContent, is AudioContent -> {
                         val pathFile = bot.getFileAdditionalInfo(commonMessage.content.media)
                         val preparedFilePath: String =
-                            downloadFilePath.format(System.getenv("botToken"), pathFile.filePath)
+                            downloadFilePath.format(BotConfiguration.BOT_TOKEN, pathFile.filePath)
                         messageService.processTelegramMessage(commonMessage, preparedFilePath)
                     }
 
@@ -172,7 +172,7 @@ class BotService(
         val keysList = listOf(LanguageType.entries.map { lang ->
             CallbackDataInlineKeyboardButton(
                 lang.name,
-                "${lang.langName}:${lang.shortcut}:$previousRequestId"
+                "LANG:${lang.shortcut}:$previousRequestId"
             )
         }.toList())
 

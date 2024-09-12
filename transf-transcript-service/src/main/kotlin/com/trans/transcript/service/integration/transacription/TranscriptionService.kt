@@ -1,8 +1,8 @@
-package com.trans.transcript.integration.transacription
+package com.trans.transcript.service.integration.transacription
 
 import com.trans.transcript.configuration.TranscriptionConfiguration
 import com.trans.transcript.exception.TranscriptionExternalException
-import com.trans.transcript.integration.client.HttpClientService
+import com.trans.transcript.service.integration.client.HttpClientService
 import com.trans.transcript.model.request.TranscriptRequest
 import com.trans.transcript.model.response.PollingResponse
 import com.trans.transcript.model.response.TranscriptResponse

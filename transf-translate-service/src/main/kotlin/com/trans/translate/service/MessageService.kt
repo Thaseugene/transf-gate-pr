@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import com.trans.translate.model.MessageStatus
 import com.trans.translate.model.request.ProcessingMessageRequest
 import com.trans.translate.model.response.ProcessingMessageResponse
-import com.trans.translate.integration.translate.TranslateService
+import com.trans.translate.service.integration.translate.TranslateService
 import com.trans.translate.service.mapping.toProcessingResponse
 import com.trans.translate.service.mapping.toTranslateMessage
 

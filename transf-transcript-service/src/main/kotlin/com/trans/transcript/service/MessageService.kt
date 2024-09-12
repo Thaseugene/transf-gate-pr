@@ -1,6 +1,6 @@
 package com.trans.transcript.service
 
-import com.trans.transcript.integration.transacription.TranscriptionService
+import com.trans.transcript.service.integration.transacription.TranscriptionService
 import com.trans.transcript.service.mapping.prepareProcessingResponse
 import com.transf.kafka.messaging.common.model.MessageStatus
 import com.transf.kafka.messaging.service.ProducingProvider

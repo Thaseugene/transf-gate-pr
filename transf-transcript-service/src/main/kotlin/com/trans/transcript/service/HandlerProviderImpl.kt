@@ -1,6 +1,6 @@
 package com.trans.transcript.service
 
-import com.trans.transcript.integration.client.HttpClientService
+import com.trans.transcript.service.integration.client.HttpClientService
 import com.trans.transcript.service.processing.ProcessingMessageHandler
 import com.transf.kafka.messaging.service.HandlerProvider
 import com.transf.kafka.messaging.service.type.HandlerType
