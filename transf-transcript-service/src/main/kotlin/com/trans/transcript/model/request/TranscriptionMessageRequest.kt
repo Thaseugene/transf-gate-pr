@@ -1,6 +1,6 @@
 package com.trans.transcript.model.request
 
-import com.transf.kafka.messaging.common.model.MessageStatus
+import com.trans.transcript.model.MessageStatus
 
 data class TranscriptionMessageRequest(
     val requestId: String,
