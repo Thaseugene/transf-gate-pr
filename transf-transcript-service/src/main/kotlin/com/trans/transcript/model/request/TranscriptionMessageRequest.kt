@@ -1,4 +1,4 @@
-package com.transf.kafka.messaging.common.model.request
+package com.trans.transcript.model.request
 
 import com.transf.kafka.messaging.common.model.MessageStatus
 

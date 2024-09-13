@@ -1,6 +1,5 @@
 package storage.trans.com.model
 
-import com.transf.kafka.messaging.common.model.MessageStatus
 import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.time.LocalDateTime
@@ -19,7 +18,7 @@ data class MessageModel(
     var messageResult: ByteArray? = null,
     var translateResult: ByteArray? = null,
     var lang: String? = null,
-    var status: MessageStatus? = null
+    var status: MessageStatus? = null,
 ) {
 
     val timeStampDate: LocalDateTime

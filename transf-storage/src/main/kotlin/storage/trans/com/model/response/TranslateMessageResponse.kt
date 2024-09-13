@@ -1,7 +1,7 @@
-package com.transf.kafka.messaging.common.model.response
+package storage.trans.com.model.response
 
 data class TranslateMessageResponse(
     val requestId: String,
     val valueToTranslate: ByteArray,
-    val lang: String
+    val lang: String,
 )

@@ -1,15 +1,14 @@
 package storage.trans.com.service.mapping
 
-import com.transf.kafka.messaging.common.model.MessageStatus
-import com.transf.kafka.messaging.common.model.request.TelegramMessageRequest
-import com.transf.kafka.messaging.common.model.request.TranscriptionMessageRequest
-import com.transf.kafka.messaging.common.model.request.TranslateMessageRequest
-import com.transf.kafka.messaging.common.model.response.TelegramMessageResponse
-import com.transf.kafka.messaging.common.model.response.TranscriptionMessageResponse
-import com.transf.kafka.messaging.common.model.response.TranslateMessageResponse
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import storage.trans.com.model.*
 import storage.trans.com.exception.InnerException
+import storage.trans.com.model.request.TelegramMessageRequest
+import storage.trans.com.model.request.TranscriptionMessageRequest
+import storage.trans.com.model.request.TranslateMessageRequest
+import storage.trans.com.model.response.TelegramMessageResponse
+import storage.trans.com.model.response.TranscriptionMessageResponse
+import storage.trans.com.model.response.TranslateMessageResponse
 import storage.trans.com.persistance.entity.MessageEntity
 import java.time.ZoneOffset
 import java.util.*

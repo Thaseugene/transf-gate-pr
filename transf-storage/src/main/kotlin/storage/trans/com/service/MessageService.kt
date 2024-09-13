@@ -1,13 +1,15 @@
 package storage.trans.com.service
 
-import com.transf.kafka.messaging.common.model.MessageStatus
-import com.transf.kafka.messaging.common.model.request.*
-import com.transf.kafka.messaging.common.model.response.TelegramMessageResponse
 import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import storage.trans.com.model.*
+import storage.trans.com.model.request.CommandStrategy
+import storage.trans.com.model.request.TelegramMessageRequest
+import storage.trans.com.model.request.TranscriptionMessageRequest
+import storage.trans.com.model.request.TranslateMessageRequest
+import storage.trans.com.model.response.TelegramMessageResponse
 import storage.trans.com.persistance.MessageRepository
 import storage.trans.com.persistance.UserRepository
 import storage.trans.com.service.mapping.*

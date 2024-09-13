@@ -1,4 +1,4 @@
-package com.transf.kafka.messaging.common.model.response
+package storage.trans.com.model.response
 
 data class TranscriptionMessageResponse(
     val requestId: String,

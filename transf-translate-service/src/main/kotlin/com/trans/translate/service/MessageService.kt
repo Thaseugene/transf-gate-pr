@@ -5,15 +5,14 @@ import com.transf.kafka.messaging.service.type.SenderType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import com.trans.translate.model.MessageStatus
-import com.trans.translate.model.request.ProcessingMessageRequest
-import com.trans.translate.model.response.ProcessingMessageResponse
+import com.trans.translate.model.response.TranslateMessageResponse
 import com.trans.translate.service.integration.translate.TranslateService
 import com.trans.translate.service.mapping.toProcessingResponse
 import com.trans.translate.service.mapping.toTranslateMessage
 
 interface MessageService {
 
-    suspend fun processTranslateMessage(message: ProcessingMessageRequest)
+    suspend fun processTranslateMessage(message: TranslateMessageResponse)
 
     suspend fun sendErrorMessage(requestId: String)
 
@@ -26,7 +25,7 @@ class MessageServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(MessageServiceImpl::class.java)
 
-    override suspend fun processTranslateMessage(message: ProcessingMessageRequest) {
+    override suspend fun processTranslateMessage(message: TranslateMessageResponse) {
         try {
             val translatedResult = translateService.prepareTranslation(message.toTranslateMessage())
             producingProvider.prepareMessageToSend(
@@ -43,7 +42,7 @@ class MessageServiceImpl(
     override suspend fun sendErrorMessage(requestId: String) {
         producingProvider.prepareMessageToSend(
             requestId,
-            ProcessingMessageResponse(requestId, status = MessageStatus.ERROR),
+            TranslateMessageResponse(requestId, status = MessageStatus.ERROR),
             SenderType.PROCESSING_SENDER
         )
     }

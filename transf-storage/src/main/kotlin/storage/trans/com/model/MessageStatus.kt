@@ -1,4 +1,4 @@
-package com.transf.kafka.messaging.common.model
+package storage.trans.com.model
 
 enum class MessageStatus {
 

@@ -2,7 +2,7 @@ package com.trans.telegram.model
 
 data class CallbackCommand(
     val requestId: String,
-    val command: CommandType
+    val command: CommandType,
 )
 
 enum class CommandType {

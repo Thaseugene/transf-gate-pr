@@ -1,11 +1,11 @@
 package storage.trans.com.service.processing
 
-import com.transf.kafka.messaging.common.model.request.TranscriptionMessageRequest
 import com.transf.kafka.messaging.service.MessageHandler
 import com.transf.kafka.messaging.service.type.HandlerType
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import storage.trans.com.model.request.TranscriptionMessageRequest
 import storage.trans.com.service.MessageService
 
 class TranscriptMessageHandler(

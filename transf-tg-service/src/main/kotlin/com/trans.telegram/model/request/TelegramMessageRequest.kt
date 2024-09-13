@@ -1,6 +1,6 @@
 package com.transf.kafka.messaging.common.model.request
 
-import com.transf.kafka.messaging.common.model.MessageStatus
+import com.trans.telegram.model.MessageStatus
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -1,11 +1,11 @@
 package storage.trans.com.persistance.entity
 
-import com.transf.kafka.messaging.common.model.MessageStatus
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.datetime
+import storage.trans.com.model.MessageStatus
 
 class MessageEntity(id: EntityID<Long>) : LongEntity(id) {
 

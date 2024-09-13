@@ -1,6 +1,5 @@
 package com.trans.dependencyinjection
 
-
 import com.transf.kafka.messaging.service.*
 import io.ktor.server.application.*
 import kotlinx.coroutines.Dispatchers

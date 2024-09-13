@@ -15,7 +15,7 @@ kafka:
     consumerTopics:
         - name: "tg-out-storage"
           handler: "PROCESSING_HANDLER"
-          deserializerType: "com.transf.kafka.messaging.common.model.response.TelegramMessageResponse"
+          deserializerType: "com.trans.telegram.model.response.TelegramMessageResponse"
 
 redis:
   address: "redis://localhost:6379"

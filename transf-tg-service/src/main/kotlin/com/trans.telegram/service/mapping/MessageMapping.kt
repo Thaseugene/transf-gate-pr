@@ -1,6 +1,6 @@
 package com.trans.telegram.service.mapping
 
-import com.transf.kafka.messaging.common.model.MessageStatus
+import com.trans.telegram.model.MessageStatus
 import com.transf.kafka.messaging.common.model.request.CommandStrategy
 import com.transf.kafka.messaging.common.model.request.TelegramMessageRequest
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from

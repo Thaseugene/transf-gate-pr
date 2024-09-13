@@ -8,17 +8,17 @@ import kotlinx.coroutines.launch
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import com.trans.translate.model.request.ProcessingMessageRequest
+import com.trans.translate.model.request.TranslateMessageRequest
 import com.trans.translate.service.MessageService
 
 class ProcessingMessageHandler (
     private val dispatcher: CoroutineDispatcher,
     private val messageService: MessageService,
-): MessageHandler<ProcessingMessageRequest> {
+): MessageHandler<TranslateMessageRequest> {
 
     private val logger: Logger = LoggerFactory.getLogger(ProcessingMessageHandler::class.java)
 
-    override fun handleMessage(message: ConsumerRecord<String, ProcessingMessageRequest>) {
+    override fun handleMessage(message: ConsumerRecord<String, TranslateMessageRequest>) {
         CoroutineScope(dispatcher).launch {
             message.value()?.let {
                 logger.info("Received Message -> ${message.value()}")
