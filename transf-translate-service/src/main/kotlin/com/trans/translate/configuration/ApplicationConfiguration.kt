@@ -27,7 +27,6 @@ fun Application.configureApplication(): ApplicationConfiguration {
         val consumerInnerConfig = ConsumerInnerConfig(
             it.property("name").getString(),
             it.property("handler").getString(),
-            it.property("deserializerType").getString(),
         )
         consumerInnerConfig.topicName to consumerInnerConfig
     }

@@ -10,6 +10,7 @@ import storage.trans.com.model.response.TelegramMessageResponse
 import storage.trans.com.model.response.TranscriptionMessageResponse
 import storage.trans.com.model.response.TranslateMessageResponse
 import storage.trans.com.persistance.entity.MessageEntity
+import storage.trans.com.persistance.entity.TranslateEntity
 import java.time.ZoneOffset
 import java.util.*
 
@@ -24,10 +25,6 @@ fun MessageEntity.updateFields(messageModel: MessageModel): MessageModel {
     messageModel.messageResult?.let {
         this.messageResult = ExposedBlob(it)
     }
-    messageModel.translateResult?.let {
-        this.translateResult = ExposedBlob(it)
-    }
-    this.lang = messageModel.lang
     return messageModel.copy(
         id = this.id.value
     )
@@ -42,23 +39,19 @@ fun MessageEntity.toMessageModel() = MessageModel(
     this.timestamp.toEpochSecond(ZoneOffset.UTC),
     this.messageValue.bytes,
     this.messageResult?.bytes,
+    this.translations.map { it.toTranslateModel() }.toList(),
+    this.status
+)
+
+fun TranslateEntity.toTranslateModel() = TranslateModel(
     this.translateResult?.bytes,
     this.lang,
-    this.status
 )
 
 fun MessageModel.updateTranscriptFields(incomingMessage: TranscriptionMessageRequest): MessageModel {
     this.timeStamp = System.currentTimeMillis()
     this.messageResult = Base64.getEncoder().encode(incomingMessage.messageResult.toByteArray())
     this.status = incomingMessage.status
-    return this
-}
-
-fun MessageModel.updateTranslateFields(incomingMessage: TranslateMessageRequest): MessageModel {
-    this.timeStamp = System.currentTimeMillis()
-    this.translateResult = incomingMessage.translatedValue
-    this.status = incomingMessage.status
-    this.lang = incomingMessage.lang
     return this
 }
 
@@ -70,7 +63,6 @@ fun TelegramMessageRequest.toMessageModel() = MessageModel(
     this.messageId,
     this.timeStamp,
     this.messageValue,
-    lang = this.lang,
     status = MessageStatus.NEW
 )
 
@@ -95,11 +87,12 @@ fun MessageModel.toTelegramResponse(result: String) = TelegramMessageResponse(
     status = this.status ?: MessageStatus.ERROR
 )
 
-fun MessageModel.toTelegramTranslateResponse(result: String) = TelegramMessageResponse(
+fun MessageModel.toTelegramTranslateResponse(result: String, lang: String? = null) = TelegramMessageResponse(
     this.requestId,
     this.chatId,
     this.messageId,
     translatedResult = result,
+    lang = lang,
     status = this.status ?: MessageStatus.ERROR
 )
 
@@ -107,6 +100,11 @@ fun TelegramMessageRequest.toTranslateMessageResponse(valueToTranslate: ByteArra
     this.requestId,
     valueToTranslate,
     this.lang ?: throw InnerException("Language isn't presented in incoming message")
+)
+
+fun TranslateMessageRequest.toTranslateModel() = TranslateModel(
+    this.translatedValue,
+    this.lang
 )
 
 fun ByteArray?.decode(): String {

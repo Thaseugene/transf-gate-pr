@@ -2,11 +2,11 @@ package com.trans.telegram
 
 import com.trans.telegram.configuration.*
 import com.trans.telegram.dependencyinjection.configureDependencies
-import com.trans.telegram.integration.tg.configureBot
 import io.ktor.server.application.*
+import io.ktor.server.cio.*
 
 fun main(args: Array<String>) {
-    io.ktor.server.cio.EngineMain.main(args)
+    EngineMain.main(args)
 }
 
 fun Application.module() {

@@ -1,8 +1,8 @@
 package com.trans.transcript.service
 
+import com.trans.transcript.model.MessageStatus
 import com.trans.transcript.service.integration.transacription.TranscriptionService
 import com.trans.transcript.service.mapping.prepareProcessingResponse
-import com.transf.kafka.messaging.common.model.MessageStatus
 import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import io.ktor.client.statement.*

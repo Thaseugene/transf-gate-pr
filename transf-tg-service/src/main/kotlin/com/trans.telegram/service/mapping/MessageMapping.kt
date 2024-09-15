@@ -1,5 +1,6 @@
 package com.trans.telegram.service.mapping
 
+import com.trans.telegram.model.CachedResponse
 import com.trans.telegram.model.MessageStatus
 import com.transf.kafka.messaging.common.model.request.CommandStrategy
 import com.transf.kafka.messaging.common.model.request.TelegramMessageRequest
@@ -39,6 +40,14 @@ fun MessageDataCallbackQuery.toProcessingMessage(
     this.from.id.chatId.long,
     this.message.messageId.long,
     System.currentTimeMillis(),
-    "XXX".encodeToByteArray(),
+    commandStrategy.toString().encodeToByteArray(),
     lang = lang
+)
+
+fun TelegramMessageRequest.toCachingValue() = CachedResponse(
+    this.userId,
+    this.requestId,
+    this.chatId,
+    this.messageId,
+    this.timeStamp
 )

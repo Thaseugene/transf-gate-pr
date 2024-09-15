@@ -16,8 +16,7 @@ data class MessageModel(
     var timeStamp: Long,
     val messageValue: ByteArray,
     var messageResult: ByteArray? = null,
-    var translateResult: ByteArray? = null,
-    var lang: String? = null,
+    val translations: List<TranslateModel>? = null,
     var status: MessageStatus? = null,
 ) {
 

@@ -21,4 +21,6 @@ class TelegramMessageHandler(
 
     override fun getType() = HandlerType.TELEGRAM_HANDLER
 
+    override fun getGenericType(): Class<TelegramMessageRequest> = TelegramMessageRequest::class.java
+
 }

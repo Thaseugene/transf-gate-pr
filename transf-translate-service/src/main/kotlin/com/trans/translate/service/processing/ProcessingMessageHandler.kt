@@ -27,9 +27,8 @@ class ProcessingMessageHandler (
         }
     }
 
-    override fun getType(): HandlerType {
-        return HandlerType.PROCESSING_HANDLER
-    }
+    override fun getType(): HandlerType = HandlerType.PROCESSING_HANDLER
+
+    override fun getGenericType(): Class<TranslateMessageRequest> = TranslateMessageRequest::class.java
 
 }
-

@@ -29,6 +29,8 @@ class ConsumingProviderImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(ConsumingProviderImpl::class.java)
 
+    private val VALUE_DESERIALIZER_TYPE: String = "value.deserializer.type"
+
     private var isShutDown: Boolean = false;
 
     override fun prepareConsumerMessaging(kafkaConfig: KafkaInnerConfig) {
@@ -78,8 +80,11 @@ class ConsumingProviderImpl(
         props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.name
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java.name
-        props["value.deserializer.type"] = Class.forName(consumerConfig.deserializerType) as Class<T>
+        handlerProvider.retrieveHandler(enumValueOf(consumerConfig.handlerName)).let {
+            props[VALUE_DESERIALIZER_TYPE] = (it as MessageHandler<T>).getGenericType()
+        }
         props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
+
         return KafkaConsumer(props)
     }
 

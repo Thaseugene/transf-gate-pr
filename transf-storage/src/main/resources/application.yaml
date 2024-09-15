@@ -27,10 +27,7 @@ kafka:
   consumerTopics:
     - name: "transcript-incoming-storage"
       handler: "TRANSCRIPT_HANDLER"
-      deserializerType: "com.transf.kafka.messaging.common.model.request.TranscriptionMessageRequest"
     - name: "tg-incoming-storage"
       handler: "TELEGRAM_HANDLER"
-      deserializerType: "com.transf.kafka.messaging.common.model.request.TelegramMessageRequest"
     - name: "translate-incoming-storage"
       handler: "TRANSLATE_HANDLER"
-      deserializerType: "com.transf.kafka.messaging.common.model.request.TranslateMessageRequest"

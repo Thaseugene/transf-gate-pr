@@ -35,8 +35,7 @@ fun Application.configureApplication(): ApplicationConfiguration {
     val consumerTopics = kafkaConfigObject.configList("consumerTopics").associate {
         val consumerInnerConfig = ConsumerInnerConfig(
             it.property("name").getString(),
-            it.property("handler").getString(),
-            it.property("deserializerType").getString(),
+            it.property("handler").getString()
         )
         consumerInnerConfig.topicName to consumerInnerConfig
     }

@@ -15,11 +15,6 @@ import storage.trans.com.persistance.entity.UserTable
 interface UserRepository {
 
     fun save(userModel: UserModel): UserModel
-    fun delete(id: Long)
-    fun update(userModel: UserModel): UserModel
-    fun findById(id: Long): UserModel
-    fun findByUserId(userId: Long): UserModel
-    fun findAll(): List<UserModel>
     fun checkIsUserPresented(userId: Long): Boolean
 
 }
@@ -42,34 +37,8 @@ class UserRepositoryImpl : UserRepository {
         )
     }
 
-    override fun delete(id: Long) = transaction {
-        val existingEntity = findExistingById(id) ?: throw RepositoryException(ExpCode.NOT_FOUND, "User with id = $id doesn't exist")
-        existingEntity.delete()
-    }
-
-    override fun update(userModel: UserModel): UserModel = transaction {
-        val existingEntity = findExistingById(userModel.userId) ?: throw RepositoryException(ExpCode.NOT_FOUND, "User with id = $id doesn't exist")
-        existingEntity.updateFields(userModel).toUserModel()
-    }
-
-    override fun findById(id: Long): UserModel = transaction {
-        findExistingById(id)?.toUserModel() ?: throw RepositoryException(ExpCode.NOT_FOUND, "User with id = $id doesn't exist")
-    }
-
-    override fun findAll(): List<UserModel> = transaction {
-        UserEntity.all().map { it.toUserModel() }
-    }
-
     override fun checkIsUserPresented(userId: Long): Boolean = transaction {
         findBy(UserTable.userId, userId).filterNotNull().map { it.toUserModel() }.isEmpty()
-    }
-
-    override fun findByUserId(userId: Long): UserModel = transaction {
-        val userList = findBy(UserTable.userId, userId).filterNotNull().map { it.toUserModel() }
-        if (userList.isEmpty()) {
-            throw RepositoryException(ExpCode.NOT_FOUND, "User with userId = $userId doesn't exist")
-        }
-        userList.first()
     }
 
     private fun findExistingById(id: Long): UserEntity? = UserEntity.findById(id)

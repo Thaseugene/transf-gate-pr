@@ -8,6 +8,7 @@ import com.trans.translate.model.MessageStatus
 import com.trans.translate.model.request.TranslateMessageRequest
 import com.trans.translate.model.response.TranslateMessageResponse
 import com.trans.translate.service.integration.translate.TranslateService
+import com.trans.translate.service.mapping.prepareTextInput
 import com.trans.translate.service.mapping.toProcessingResponse
 import com.trans.translate.service.mapping.toTranslateMessage
 
@@ -27,15 +28,17 @@ class MessageServiceImpl(
     private val logger: Logger = LoggerFactory.getLogger(MessageServiceImpl::class.java)
 
     override suspend fun processTranslateMessage(message: TranslateMessageRequest) {
-        try {
-            val translatedResult = translateService.prepareTranslation(message.toTranslateMessage())
+        runCatching {
+            val result = prepareTextInput(message.valueToTranslate)
+                .map { translateService.prepareTranslation(message.toTranslateMessage(it)) }
+                .reduce { acc, s -> acc.plus(s) }
             producingProvider.prepareMessageToSend(
                 message.requestId,
-                translatedResult.toProcessingResponse(message.requestId, message.lang),
+                result.toProcessingResponse(message.requestId, message.lang),
                 SenderType.PROCESSING_SENDER
             )
-        } catch (ex: Exception) {
-            logger.error("Unexpected error while processing message for translate", ex)
+        }.onFailure {
+            logger.error("Unexpected error while processing message for translate", it)
             sendErrorMessage(message.requestId)
         }
     }

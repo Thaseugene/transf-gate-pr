@@ -15,4 +15,3 @@ kafka:
   consumerTopics:
     - name: "transcript-out-storage"
       handler: "PROCESSING_HANDLER"
-      deserializerType: "com.transf.kafka.messaging.common.model.response.TranscriptionMessageResponse"

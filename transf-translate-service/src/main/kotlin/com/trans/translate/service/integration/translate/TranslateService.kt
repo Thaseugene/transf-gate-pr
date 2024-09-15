@@ -30,7 +30,7 @@ class TranslateServiceImpl(
             messageToTranslate
         )
         response.translations?.let {
-            return it[0].translated.first()
+            return it[0].translated.reduce { acc, s -> acc.plus(s) }
         }
         response.details?.let {
             return it.texts ?: throw RuntimeException()

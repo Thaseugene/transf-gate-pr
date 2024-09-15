@@ -1,6 +1,7 @@
 package com.trans.telegram.service
 
 import com.trans.telegram.service.cache.CacheService
+import com.trans.telegram.service.mapping.toCachingValue
 import com.trans.telegram.service.mapping.toProcessingMessage
 import com.transf.kafka.messaging.common.model.request.CommandStrategy
 import com.transf.kafka.messaging.service.ProducingProvider
@@ -42,7 +43,7 @@ class MessageServiceImpl(
                 SenderType.PROCESSING_SENDER
             )
             CoroutineScope(dispatcher).launch {
-                cacheService.insertCacheData(it.requestId, it)
+                cacheService.insertCacheData(it.requestId, it.toCachingValue())
             }
         }
     }

@@ -1,8 +1,8 @@
 package com.trans.transcript.service.processing
 
+import com.trans.transcript.model.response.TranscriptionMessageResponse
 import com.trans.transcript.service.integration.client.HttpClientService
 import com.trans.transcript.service.MessageService
-import com.transf.kafka.messaging.common.model.response.TranscriptionMessageResponse
 import com.transf.kafka.messaging.service.type.HandlerType
 import com.transf.kafka.messaging.service.MessageHandler
 import io.ktor.client.statement.*
@@ -39,8 +39,8 @@ class ProcessingMessageHandler(
         }
     }
 
-    override fun getType(): HandlerType {
-        return HandlerType.PROCESSING_HANDLER
-    }
+    override fun getType(): HandlerType = HandlerType.PROCESSING_HANDLER
+
+    override fun getGenericType(): Class<TranscriptionMessageResponse> = TranscriptionMessageResponse::class.java
 
 }

@@ -5,6 +5,7 @@ import com.transf.kafka.messaging.service.type.HandlerType
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import storage.trans.com.model.request.TranscriptionMessageRequest
 import storage.trans.com.model.request.TranslateMessageRequest
 import storage.trans.com.service.MessageService
 
@@ -20,5 +21,7 @@ class TranslateMessageHandler(
     }
 
     override fun getType() = HandlerType.TRANSLATE_HANDLER
+
+    override fun getGenericType(): Class<TranslateMessageRequest> = TranslateMessageRequest::class.java
 
 }

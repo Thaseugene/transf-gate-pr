@@ -39,4 +39,14 @@
         <sqlFile path="db/changelog/2024-06-18/feature-4-create-message-table.sql"/>
     </changeSet>
 
+    <changeSet id="feature-4-create-translate-table" author="Budnichenka YS">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="TRANSLATES"/>
+            </not>
+            <tableExists tableName="MESSAGES"/>
+        </preConditions>
+        <sqlFile path="db/changelog/2024-06-18/feature-4-create-translate-table.sql"/>
+    </changeSet>
+
 </databaseChangeLog>

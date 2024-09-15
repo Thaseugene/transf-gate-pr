@@ -7,6 +7,7 @@ val h2_version: String by project
 val postgres_version: String by project
 val koin_version: String by project
 val ktor_version: String by project
+val junit_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -70,4 +71,13 @@ dependencies {
     // koin
     implementation("io.insert-koin:koin-ktor:$koin_version")
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
+
+    // testing
+    testImplementation("org.junit.jupiter:junit-jupiter:$junit_version")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
+    testImplementation("org.assertj:assertj-core:3.23.1")
+    testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
+    testImplementation("io.insert-koin:koin-test:$koin_version")
+    testImplementation("io.insert-koin:koin-test-junit5:$koin_version")
+
 }
