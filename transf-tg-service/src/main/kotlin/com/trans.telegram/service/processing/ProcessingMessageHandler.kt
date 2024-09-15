@@ -25,8 +25,8 @@ class ProcessingMessageHandler(
             message.value()?.let {
                 runCatching {
                     logger.info("Handled message -> ${message.value()}")
-                    if (it.translatedResult != null && it.status == MessageStatus.OK && it.chatId != null && it.messageId != null) {
-                        processor.sendSuccessTranslateMessage(it)
+                    if (it.translatedResult != null && it.status == MessageStatus.OK && it.chatId != null && it.messageId != null && it.requestId != null) {
+                        processor.sendSuccessTranslateMessage(it.translatedResult, it.chatId, it.messageId, it.requestId, it.lang)
                         return@launch;
                     }
                     if (it.result != null && it.status == MessageStatus.OK && it.chatId != null && it.messageId != null) {
