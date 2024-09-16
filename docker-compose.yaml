@@ -49,8 +49,6 @@ services:
     image: postgres:14-alpine
     ports:
       - 5432:5432
-    volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
@@ -58,6 +56,14 @@ services:
       - POSTGRES_INITDB_ARGS="--auth-local=md5"
     networks:
       - kafka-net
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    networks:
+      - kafka-net
+    restart: always
 
 networks:
   kafka-net:
