@@ -1,6 +1,5 @@
 package com.trans.telegram.service.processing
 
-import com.trans.telegram.service.tg.BotService
 import com.trans.telegram.model.MessageStatus
 import com.trans.telegram.model.response.TelegramMessageResponse
 import com.trans.telegram.service.tg.BotMessageProcessor
@@ -26,7 +25,13 @@ class ProcessingMessageHandler(
                 runCatching {
                     logger.info("Handled message -> ${message.value()}")
                     if (it.translatedResult != null && it.status == MessageStatus.OK && it.chatId != null && it.messageId != null && it.requestId != null) {
-                        processor.sendSuccessTranslateMessage(it.translatedResult, it.chatId, it.messageId, it.requestId, it.lang)
+                        processor.sendSuccessTranslateMessage(
+                            it.translatedResult,
+                            it.chatId,
+                            it.messageId,
+                            it.requestId,
+                            it.lang
+                        )
                         return@launch;
                     }
                     if (it.result != null && it.status == MessageStatus.OK && it.chatId != null && it.messageId != null) {

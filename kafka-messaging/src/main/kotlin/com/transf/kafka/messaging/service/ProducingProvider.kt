@@ -1,8 +1,8 @@
 package com.transf.kafka.messaging.service
 
-import com.transf.kafka.messaging.service.type.SenderType
 import com.transf.kafka.messaging.configuration.KafkaInnerConfig
 import com.transf.kafka.messaging.serder.JsonSerializer
+import com.transf.kafka.messaging.service.type.SenderType
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord

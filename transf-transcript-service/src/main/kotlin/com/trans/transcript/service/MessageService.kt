@@ -18,7 +18,7 @@ interface MessageService {
 class MessageServiceImpl(
     private val transcriptionService: TranscriptionService,
     private val producingProvider: ProducingProvider
-): MessageService {
+) : MessageService {
 
     override suspend fun processTranscriptionMessage(response: HttpResponse, requestId: String) {
         val result = transcriptionService.tryToMakeTranscript(response.readBytes())

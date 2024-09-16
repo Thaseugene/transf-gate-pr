@@ -5,7 +5,6 @@ import com.transf.kafka.messaging.service.type.HandlerType
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import storage.trans.com.model.request.TelegramMessageRequest
 import storage.trans.com.model.request.TranscriptionMessageRequest
 import storage.trans.com.service.MessageService
 

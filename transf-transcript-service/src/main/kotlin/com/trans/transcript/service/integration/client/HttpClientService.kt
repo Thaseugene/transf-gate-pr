@@ -41,7 +41,7 @@ class HttpClientService {
     ): T {
         return client.request(url) {
             this.method = method
-            contentType?. let { this.contentType(it) }
+            contentType?.let { this.contentType(it) }
             headers.forEach { entry -> header(entry.key, entry.value) }
             body?.let { setBody(it) }
         }.body()

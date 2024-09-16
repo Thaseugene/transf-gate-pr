@@ -1,10 +1,10 @@
 package com.trans.translate.service.mapping
 
-import okhttp3.internal.immutableListOf
 import com.trans.translate.model.MessageStatus
 import com.trans.translate.model.request.TranslateMessageRequest
-import com.trans.translate.model.response.TranslateMessageResponse
 import com.trans.translate.model.request.TranslateRequest
+import com.trans.translate.model.response.TranslateMessageResponse
+import okhttp3.internal.immutableListOf
 import java.util.*
 
 fun TranslateMessageRequest.toTranslateMessage(text: String) = TranslateRequest(

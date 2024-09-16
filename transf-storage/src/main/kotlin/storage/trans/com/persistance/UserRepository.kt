@@ -1,16 +1,13 @@
 package storage.trans.com.persistance
 
-import com.trans.exception.RepositoryException
-import storage.trans.com.service.mapping.toUserModel
-import storage.trans.com.service.mapping.updateFields
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import storage.trans.com.model.UserModel
-import storage.trans.com.exception.ExpCode
 import storage.trans.com.persistance.entity.UserEntity
 import storage.trans.com.persistance.entity.UserTable
+import storage.trans.com.service.mapping.toUserModel
 
 interface UserRepository {
 

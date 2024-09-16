@@ -2,8 +2,6 @@ package com.trans.telegram.configuration
 
 import com.trans.telegram.service.tg.BotService
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
-import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
-import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
 import io.ktor.server.application.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

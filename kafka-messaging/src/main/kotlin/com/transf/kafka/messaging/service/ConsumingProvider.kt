@@ -3,14 +3,15 @@ package com.transf.kafka.messaging.service
 import com.transf.kafka.messaging.configuration.ConsumerInnerConfig
 import com.transf.kafka.messaging.configuration.KafkaInnerConfig
 import com.transf.kafka.messaging.serder.JsonDeserializer
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import java.util.*
 
 interface ConsumingProvider {

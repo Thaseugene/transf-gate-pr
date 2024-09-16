@@ -15,9 +15,22 @@ class CacheService {
         cacheMessageDuration = redisConfig.cacheMessageDuration
     }
 
-    fun insertCacheData(key: String, value: Any) {
+    fun insertCacheData(
+        key: String,
+        value: Any
+    ) {
         jedisPool?.resource?.use { jedis ->
             jedis.setex(key, cacheMessageDuration, HandlerProvider.objectMapper.writeValueAsString(value))
+        }
+    }
+
+    fun swapCachedData(
+        key: String,
+        value: Any
+    ) {
+        jedisPool?.resource?.use { jedis ->
+            jedis.del(key)
+            insertCacheData(key, value)
         }
     }
 

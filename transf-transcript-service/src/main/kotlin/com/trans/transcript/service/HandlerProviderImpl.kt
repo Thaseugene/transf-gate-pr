@@ -10,7 +10,7 @@ class HandlerProviderImpl(
     private val dispatcher: CoroutineDispatcher,
     private val messageService: MessageService,
     private val clientService: HttpClientService
-): HandlerProvider {
+) : HandlerProvider {
 
     private val handlers = mutableMapOf<HandlerType, Any>()
 

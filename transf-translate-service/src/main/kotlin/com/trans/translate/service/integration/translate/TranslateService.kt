@@ -1,10 +1,10 @@
 package com.trans.translate.service.integration.translate
 
 import com.trans.translate.configuration.TranslateConfiguration
-import io.ktor.http.*
 import com.trans.translate.model.request.TranslateRequest
 import com.trans.translate.model.response.TranslateResponse
 import com.trans.translate.service.integration.client.HttpClientService
+import io.ktor.http.*
 
 interface TranslateService {
 

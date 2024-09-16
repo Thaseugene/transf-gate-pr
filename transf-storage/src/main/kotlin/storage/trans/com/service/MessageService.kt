@@ -4,8 +4,7 @@ import com.transf.kafka.messaging.service.ProducingProvider
 import com.transf.kafka.messaging.service.type.SenderType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import storage.trans.com.exception.InnerException
-import storage.trans.com.model.*
+import storage.trans.com.model.MessageStatus
 import storage.trans.com.model.request.CommandStrategy
 import storage.trans.com.model.request.TelegramMessageRequest
 import storage.trans.com.model.request.TranscriptionMessageRequest
@@ -21,8 +20,6 @@ interface MessageService {
     fun processIncomingMessage(incomingMessage: TelegramMessageRequest, requestId: String)
     fun processIncomingTranscriptMessage(incomingMessage: TranscriptionMessageRequest)
     fun processIncomingTranslateMessage(incomingMessage: TranslateMessageRequest)
-    fun updateEvent(event: MessageModel): MessageModel
-    fun findMessageById(id: Long): MessageModel
 
 }
 
@@ -68,15 +65,16 @@ class MessageServiceImpl(
 
     override fun processIncomingTranslateMessage(incomingMessage: TranslateMessageRequest) {
         runCatching {
-                val withNewTranslation = messageRepository.saveTranslation(incomingMessage.toTranslateModel(), incomingMessage.requestId)
-                producingProvider.prepareMessageToSend(
-                    incomingMessage.requestId,
-                    withNewTranslation.toTelegramTranslateResponse(
-                        incomingMessage.translatedValue.decode(),
-                        incomingMessage.lang
-                    ),
-                    SenderType.TELEGRAM_SENDER
-                )
+            val withNewTranslation =
+                messageRepository.saveTranslation(incomingMessage.toTranslateModel(), incomingMessage.requestId)
+            producingProvider.prepareMessageToSend(
+                incomingMessage.requestId,
+                withNewTranslation.toTelegramTranslateResponse(
+                    incomingMessage.translatedValue.decode(),
+                    incomingMessage.lang
+                ),
+                SenderType.TELEGRAM_SENDER
+            )
 
         }.onFailure {
             logger.error(
@@ -89,16 +87,6 @@ class MessageServiceImpl(
                 SenderType.TELEGRAM_SENDER
             )
         }
-    }
-
-
-    override fun updateEvent(event: MessageModel): MessageModel {
-        logger.info("Start updating process of event model - $event")
-        return messageRepository.update(event)
-    }
-
-    override fun findMessageById(id: Long): MessageModel {
-        return messageRepository.findById(id)
     }
 
     private fun processMessageForTranscript(incomingMessage: TelegramMessageRequest) {
@@ -128,13 +116,16 @@ class MessageServiceImpl(
     private fun processMessageForTranslate(incomingMessage: TelegramMessageRequest, requestId: String) {
         runCatching {
             messageRepository.findByRequestId(requestId)?.let { message ->
-                if (message.translations != null &&
-                    message.translations.any
-                    { translateModel -> translateModel.lang?.equals(incomingMessage.lang) == true }
-                ) {
+                val translatedResult = message.translations?.firstOrNull { translateModel ->
+                    translateModel.lang?.equals(incomingMessage.lang) == true
+                }
+                translatedResult?.let {
                     producingProvider.prepareMessageToSend(
                         incomingMessage.requestId,
-                        message.toTelegramTranslateResponse("Translated result has been sent to you before"),
+                        message.toTelegramTranslateResponse(
+                            translatedResult.translateResult.decode(),
+                            incomingMessage.lang
+                        ),
                         SenderType.TELEGRAM_SENDER
                     )
                     return
@@ -148,6 +139,7 @@ class MessageServiceImpl(
                 }
             }
         }.onFailure {
+            logger.error("Unexpected error while processing translation message", it)
             producingProvider.prepareMessageToSend(
                 incomingMessage.requestId,
                 TelegramMessageResponse(status = MessageStatus.ERROR),

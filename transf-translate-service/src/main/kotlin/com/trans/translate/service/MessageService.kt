@@ -1,9 +1,5 @@
 package com.trans.translate.service
 
-import com.transf.kafka.messaging.service.ProducingProvider
-import com.transf.kafka.messaging.service.type.SenderType
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import com.trans.translate.model.MessageStatus
 import com.trans.translate.model.request.TranslateMessageRequest
 import com.trans.translate.model.response.TranslateMessageResponse
@@ -11,6 +7,10 @@ import com.trans.translate.service.integration.translate.TranslateService
 import com.trans.translate.service.mapping.prepareTextInput
 import com.trans.translate.service.mapping.toProcessingResponse
 import com.trans.translate.service.mapping.toTranslateMessage
+import com.transf.kafka.messaging.service.ProducingProvider
+import com.transf.kafka.messaging.service.type.SenderType
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 interface MessageService {
 

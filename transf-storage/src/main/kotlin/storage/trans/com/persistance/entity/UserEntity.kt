@@ -7,7 +7,7 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 
 const val DEFAULT_VARCHAR_COLUMN_LENGTH = 255
 
-class UserEntity(id: EntityID<Long>): LongEntity(id) {
+class UserEntity(id: EntityID<Long>) : LongEntity(id) {
 
     var userId by UserTable.userId
     var userName by UserTable.userName
@@ -18,7 +18,7 @@ class UserEntity(id: EntityID<Long>): LongEntity(id) {
 
 }
 
-object UserTable: LongIdTable("USERS", "ID") {
+object UserTable : LongIdTable("USERS", "ID") {
 
     val userId = long("USER_ID")
     val userName = varchar("USER_NAME", DEFAULT_VARCHAR_COLUMN_LENGTH).nullable()

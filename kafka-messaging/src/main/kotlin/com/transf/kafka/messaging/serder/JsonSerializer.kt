@@ -7,7 +7,7 @@ import org.apache.kafka.common.serialization.Serializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class JsonSerializer<T>: Serializer<T> {
+class JsonSerializer<T> : Serializer<T> {
 
     private val logger: Logger = LoggerFactory.getLogger(JsonDeserializer::class.java)
 
@@ -20,7 +20,7 @@ class JsonSerializer<T>: Serializer<T> {
     override fun serialize(topic: String?, data: T?): ByteArray? {
         if (data == null) return null
         return try {
-             mapper.writeValueAsBytes(data)
+            mapper.writeValueAsBytes(data)
         } catch (e: Exception) {
             logger.error(e.message, e)
             null

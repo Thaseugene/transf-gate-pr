@@ -1,12 +1,32 @@
 <configuration>
+
+    <property name="LOG_HOME" value="./logs" />
+
+    <property name="PATTERN" value="%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DEVELOP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/develop.log</file>
+        <prudent>true</prudent>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/develop-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${PATTERN}</pattern>
         </encoder>
     </appender>
 
     <root level="ALL">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="DEVELOP"/>
     </root>
 
     <logger name="io.ktor" level="ALL"/>

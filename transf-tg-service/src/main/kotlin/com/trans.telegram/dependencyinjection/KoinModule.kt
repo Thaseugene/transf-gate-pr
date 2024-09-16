@@ -1,13 +1,13 @@
 package com.trans.telegram.dependencyinjection
 
 import com.trans.telegram.configuration.BotConfiguration
-import com.trans.telegram.service.tg.BotService
 import com.trans.telegram.service.HandlerProviderImpl
 import com.trans.telegram.service.MessageService
 import com.trans.telegram.service.MessageServiceImpl
 import com.trans.telegram.service.cache.CacheService
 import com.trans.telegram.service.processing.ProcessingMessageHandler
 import com.trans.telegram.service.tg.BotMessageProcessor
+import com.trans.telegram.service.tg.BotService
 import com.transf.kafka.messaging.service.*
 import io.ktor.server.application.*
 import kotlinx.coroutines.Dispatchers

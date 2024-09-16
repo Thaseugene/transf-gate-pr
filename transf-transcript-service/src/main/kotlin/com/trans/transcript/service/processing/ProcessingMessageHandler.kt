@@ -1,10 +1,10 @@
 package com.trans.transcript.service.processing
 
 import com.trans.transcript.model.response.TranscriptionMessageResponse
-import com.trans.transcript.service.integration.client.HttpClientService
 import com.trans.transcript.service.MessageService
-import com.transf.kafka.messaging.service.type.HandlerType
+import com.trans.transcript.service.integration.client.HttpClientService
 import com.transf.kafka.messaging.service.MessageHandler
+import com.transf.kafka.messaging.service.type.HandlerType
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineDispatcher

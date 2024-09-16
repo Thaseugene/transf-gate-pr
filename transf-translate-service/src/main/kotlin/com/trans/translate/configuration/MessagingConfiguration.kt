@@ -1,7 +1,7 @@
 package com.trans.translate.configuration
 
-import com.transf.kafka.messaging.service.ConsumingProvider
 import com.transf.kafka.messaging.configuration.KafkaInnerConfig
+import com.transf.kafka.messaging.service.ConsumingProvider
 import com.transf.kafka.messaging.service.ProducingProvider
 import io.ktor.server.application.*
 import kotlinx.coroutines.CoroutineDispatcher

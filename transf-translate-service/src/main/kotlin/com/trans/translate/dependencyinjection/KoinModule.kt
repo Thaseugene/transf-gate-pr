@@ -1,17 +1,17 @@
 package com.trans.translate.dependencyinjection
 
+import com.trans.translate.service.HandlerProviderImpl
+import com.trans.translate.service.MessageService
+import com.trans.translate.service.MessageServiceImpl
+import com.trans.translate.service.integration.client.HttpClientService
+import com.trans.translate.service.integration.translate.TranslateService
+import com.trans.translate.service.integration.translate.TranslateServiceImpl
 import com.transf.kafka.messaging.service.*
 import io.ktor.server.application.*
 import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.SLF4JLogger
-import com.trans.translate.service.integration.client.HttpClientService
-import com.trans.translate.service.integration.translate.TranslateService
-import com.trans.translate.service.integration.translate.TranslateServiceImpl
-import com.trans.translate.service.HandlerProviderImpl
-import com.trans.translate.service.MessageService
-import com.trans.translate.service.MessageServiceImpl
 
 val TG_SERVICE_MODULE = module {
     single { Dispatchers.IO }

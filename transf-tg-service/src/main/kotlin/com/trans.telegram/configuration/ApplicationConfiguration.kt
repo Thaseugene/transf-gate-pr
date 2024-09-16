@@ -17,7 +17,7 @@ fun Application.configureApplication(): ApplicationConfiguration {
     val kafkaConfigObject = environment.config.config("kafka")
     val bootstrapServers = kafkaConfigObject.property("bootstrapServers").getList()
     val groupId = kafkaConfigObject.property("groupId").getString()
-    val producerTopics =  kafkaConfigObject.configList("producerTopics").associate {
+    val producerTopics = kafkaConfigObject.configList("producerTopics").associate {
         val producerInnerConfig = ProducerInnerConfig(
             it.property("name").getString(),
             it.property("senderType").getString()

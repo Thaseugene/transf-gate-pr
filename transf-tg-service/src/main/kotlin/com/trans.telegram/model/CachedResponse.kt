@@ -7,5 +7,5 @@ data class CachedResponse(
     val messageId: Long,
     val timeStamp: Long,
     var transcriptResult: String? = null,
-    val translations: Map<String, String> = mutableMapOf(),
+    var translations: List<Pair<String, String>> = mutableListOf()
 )

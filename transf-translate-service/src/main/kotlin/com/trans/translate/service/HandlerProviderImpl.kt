@@ -1,14 +1,14 @@
 package com.trans.translate.service
 
+import com.trans.translate.service.processing.ProcessingMessageHandler
 import com.transf.kafka.messaging.service.HandlerProvider
 import com.transf.kafka.messaging.service.type.HandlerType
 import kotlinx.coroutines.CoroutineDispatcher
-import com.trans.translate.service.processing.ProcessingMessageHandler
 
 class HandlerProviderImpl(
     private val dispatcher: CoroutineDispatcher,
     private val messageService: MessageService,
-): HandlerProvider {
+) : HandlerProvider {
 
     private val handlers = mutableMapOf<HandlerType, Any>()
 

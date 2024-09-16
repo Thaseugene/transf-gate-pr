@@ -5,7 +5,6 @@ import com.transf.kafka.messaging.service.type.HandlerType
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import storage.trans.com.model.request.TranscriptionMessageRequest
 import storage.trans.com.model.request.TranslateMessageRequest
 import storage.trans.com.service.MessageService
 
@@ -16,7 +15,7 @@ class TranslateMessageHandler(
     private val logger: Logger = LoggerFactory.getLogger(TranslateMessageHandler::class.java)
 
     override fun handleMessage(message: ConsumerRecord<String, TranslateMessageRequest>) {
-        logger.info("Message -> ${message.value()}")
+        logger.info("Handled message -> ${message.value()}")
         messageService.processIncomingTranslateMessage(message.value())
     }
 

@@ -1,20 +1,20 @@
 ktor:
-    application:
-        modules:
-            - com.trans.telegram.ApplicationKt.module
-    deployment:
-        port: 8097
+  application:
+    modules:
+      - com.trans.telegram.ApplicationKt.module
+  deployment:
+    port: 8097
 
 kafka:
-    groupId: "telegram-service-group"
-    bootstrapServers:
-        - "http://localhost:9092"
-    producerTopics:
-        - name: "tg-incoming-storage"
-          senderType: "PROCESSING_SENDER"
-    consumerTopics:
-        - name: "tg-out-storage"
-          handler: "PROCESSING_HANDLER"
+  groupId: "telegram-service-group"
+  bootstrapServers:
+    - "http://localhost:9092"
+  producerTopics:
+    - name: "tg-incoming-storage"
+      senderType: "PROCESSING_SENDER"
+  consumerTopics:
+    - name: "tg-out-storage"
+      handler: "PROCESSING_HANDLER"
 
 redis:
   address: "redis://localhost:6379"

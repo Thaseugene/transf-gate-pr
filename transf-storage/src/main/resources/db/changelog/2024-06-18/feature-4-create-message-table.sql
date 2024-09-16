@@ -1,14 +1,14 @@
 CREATE TABLE MESSAGES
 (
-    ID                 BIGSERIAL PRIMARY KEY NOT NULL,
-    USER_ID            BIGINT                NOT NULL,
-    CHAT_ID            BIGINT                NOT NULL,
-    MESSAGE_ID         BIGINT                NOT NULL,
-    REQUEST_ID         VARCHAR(255)          NOT NULL,
-    TIMESTAMP          TIMESTAMP             NOT NULL,
-    MESSAGE_VALUE      BYTEA                 NOT NULL,
-    MESSAGE_RESULT     BYTEA,
-    STATUS             BIGINT,
+    ID             BIGSERIAL PRIMARY KEY NOT NULL,
+    USER_ID        BIGINT                NOT NULL,
+    CHAT_ID        BIGINT                NOT NULL,
+    MESSAGE_ID     BIGINT                NOT NULL,
+    REQUEST_ID     VARCHAR(255)          NOT NULL,
+    TIMESTAMP      TIMESTAMP             NOT NULL,
+    MESSAGE_VALUE  BYTEA                 NOT NULL,
+    MESSAGE_RESULT BYTEA,
+    STATUS         BIGINT,
     CONSTRAINT UN_REQUEST UNIQUE (REQUEST_ID),
     CONSTRAINT FK_USER FOREIGN KEY (USER_ID) REFERENCES USERS (USER_ID),
     CONSTRAINT FK_STATUS FOREIGN KEY (STATUS) REFERENCES MESSAGE_STATUS (ID)

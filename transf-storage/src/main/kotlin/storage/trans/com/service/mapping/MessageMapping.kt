@@ -1,8 +1,11 @@
 package storage.trans.com.service.mapping
 
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
-import storage.trans.com.model.*
-import storage.trans.com.exception.InnerException
+import storage.trans.com.exception.ProcessingServiceException
+import storage.trans.com.model.MessageModel
+import storage.trans.com.model.MessageStatus
+import storage.trans.com.model.TranslateModel
+import storage.trans.com.model.UserModel
 import storage.trans.com.model.request.TelegramMessageRequest
 import storage.trans.com.model.request.TranscriptionMessageRequest
 import storage.trans.com.model.request.TranslateMessageRequest
@@ -99,7 +102,7 @@ fun MessageModel.toTelegramTranslateResponse(result: String, lang: String? = nul
 fun TelegramMessageRequest.toTranslateMessageResponse(valueToTranslate: ByteArray) = TranslateMessageResponse(
     this.requestId,
     valueToTranslate,
-    this.lang ?: throw InnerException("Language isn't presented in incoming message")
+    this.lang ?: throw ProcessingServiceException("Language isn't presented in incoming message")
 )
 
 fun TranslateMessageRequest.toTranslateModel() = TranslateModel(
@@ -109,7 +112,7 @@ fun TranslateMessageRequest.toTranslateModel() = TranslateModel(
 
 fun ByteArray?.decode(): String {
     return if (this == null)
-        throw InnerException("Couldn't decode value from Base64") else
+        throw ProcessingServiceException("Couldn't decode value from Base64") else
         Base64.getDecoder().decode(this).decodeToString()
 }
 

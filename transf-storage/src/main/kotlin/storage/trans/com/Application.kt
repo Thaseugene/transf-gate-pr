@@ -2,11 +2,7 @@ package storage.trans.com
 
 import com.trans.dependencyinjection.configureDependencies
 import io.ktor.server.application.*
-import storage.trans.com.configuration.configureApplication
-import storage.trans.com.configuration.configureDatabase
-import storage.trans.com.configuration.configureMessaging
-import storage.trans.com.configuration.configureShutdownEvent
-import storage.trans.com.configuration.invokeMigrationProcess
+import storage.trans.com.configuration.*
 
 
 fun main(args: Array<String>) {

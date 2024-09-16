@@ -1,5 +1,6 @@
 package com.trans.telegram.service
 
+import com.trans.telegram.model.CachedResponse
 import com.trans.telegram.service.cache.CacheService
 import com.trans.telegram.service.mapping.toCachingValue
 import com.trans.telegram.service.mapping.toProcessingMessage
@@ -35,7 +36,7 @@ class MessageServiceImpl(
         incomingMessage: ContentMessage<MediaContent>,
         downloadFilePath: String
     ) {
-        logger.info("Preparing incoming message from user -> ${incomingMessage.chat.id.chatId.long}")
+        logger.info("Preparing incoming transcript message from user -> ${incomingMessage.chat.id.chatId.long}")
         incomingMessage.toProcessingMessage(downloadFilePath, CommandStrategy.TRANSCRIPTION).also {
             producingProvider.prepareMessageToSend(
                 it.requestId,
@@ -53,14 +54,20 @@ class MessageServiceImpl(
         lang: String,
         requestId: String
     ) {
-        logger.info("Preparing incoming message from user -> ${incomingMessage.from.id.chatId.long}")
+        logger.info("Preparing incoming translate message from user -> ${incomingMessage.from.id.chatId.long}")
         incomingMessage.toProcessingMessage(requestId, lang, CommandStrategy.TRANSLATION).also {
             producingProvider.prepareMessageToSend(
                 it.requestId,
                 it,
                 SenderType.PROCESSING_SENDER
             )
+            if (cacheService.retrieveCachedValue<CachedResponse>(requestId) == null) {
+                CoroutineScope(dispatcher).launch {
+                    cacheService.insertCacheData(it.requestId, it.toCachingValue())
+                }
+            }
         }
+
 
     }
 

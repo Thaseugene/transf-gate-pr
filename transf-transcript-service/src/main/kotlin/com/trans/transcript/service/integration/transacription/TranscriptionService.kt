@@ -2,11 +2,11 @@ package com.trans.transcript.service.integration.transacription
 
 import com.trans.transcript.configuration.TranscriptionConfiguration
 import com.trans.transcript.exception.TranscriptionExternalException
-import com.trans.transcript.service.integration.client.HttpClientService
 import com.trans.transcript.model.request.TranscriptRequest
 import com.trans.transcript.model.response.PollingResponse
 import com.trans.transcript.model.response.TranscriptResponse
 import com.trans.transcript.model.response.UploadResponse
+import com.trans.transcript.service.integration.client.HttpClientService
 import io.ktor.http.*
 import kotlinx.coroutines.delay
 import org.slf4j.Logger
@@ -20,7 +20,7 @@ interface TranscriptionService {
 
 class TranscriptionServiceImpl(
     private val clientService: HttpClientService
-): TranscriptionService {
+) : TranscriptionService {
 
     private val logger: Logger = LoggerFactory.getLogger(TranscriptionServiceImpl::class.java)
 

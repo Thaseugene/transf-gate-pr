@@ -19,7 +19,7 @@ class BotService(
 
     private suspend fun launchMessageListener() {
         bot.buildBehaviourWithLongPolling {
-            onCommand("start") {
+            onCommand(START_COMMAND) {
                 messageProcessor.processDefaultMessage(it)
             }
             onMedia(initialFilter = null) {
@@ -29,7 +29,7 @@ class BotService(
                 messageProcessor.processDefaultMessage(it)
             }
             onDataCallbackQuery {
-                answer(it,"")
+                answer(it, EMPTY_MESSAGE)
                 messageProcessor.processCallBackMessages(it)
             }
         }.join()

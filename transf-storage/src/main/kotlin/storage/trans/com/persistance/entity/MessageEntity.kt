@@ -7,7 +7,7 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.datetime
 import storage.trans.com.model.MessageStatus
 
-class MessageEntity(id: EntityID<Long>): LongEntity(id) {
+class MessageEntity(id: EntityID<Long>) : LongEntity(id) {
 
     var userId by MessageTable.userId
     var requestId by MessageTable.requestId
@@ -23,7 +23,7 @@ class MessageEntity(id: EntityID<Long>): LongEntity(id) {
 
 }
 
-object MessageTable: LongIdTable("MESSAGES", "ID") {
+object MessageTable : LongIdTable("MESSAGES", "ID") {
 
     val userId = reference("USER_ID", UserTable.userId)
     val requestId = varchar("REQUEST_ID", DEFAULT_VARCHAR_COLUMN_LENGTH)

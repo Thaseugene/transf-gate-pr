@@ -1,6 +1,3 @@
-package com.trans.exception
+package storage.trans.com.exception
 
-import storage.trans.com.exception.ExpCode
-import storage.trans.com.exception.InnerException
-
-class RepositoryException(expCode: ExpCode, message: String): InnerException(message)
+class RepositoryException(message: String) : RuntimeException(message)
