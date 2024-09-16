@@ -50,6 +50,7 @@ class BotMessageProcessor(
 
     suspend fun processCallBackMessages(dataCallbackQuery: DataCallbackQuery) {
         runCatching {
+            logger.info("Received callbackMessage - {}", objectMapper.writeValueAsString(dataCallbackQuery))
             val callBackResult = dataCallbackQuery.data.split(":");
             when (CallbackCommandType.valueOf(callBackResult.first())) {
                 CallbackCommandType.TRANSLATE -> sendLangChooseMessage(
@@ -65,9 +66,11 @@ class BotMessageProcessor(
                         val cachedData = cacheService.retrieveCachedValue<CachedResponse>(requestId)
                         cachedData?.let {
                             if (it.translations.isNotEmpty()) {
-                                val cachedResult = it.translations.first { translation -> translation.first == lang }
-                                sendAnswer(cachedResult.second, it.chatId, it.messageId)
-                                return@runCatching
+                                val cachedResult = it.translations.firstOrNull { translation -> translation.first == lang }
+                                if (cachedResult != null) {
+                                    sendAnswer(cachedResult.second, it.chatId, it.messageId)
+                                    return@runCatching
+                                }
                             }
                         }
                         messageService.processTranslateMessage(dataCallbackQuery, lang, requestId)
@@ -83,7 +86,7 @@ class BotMessageProcessor(
 
     suspend fun processMediaInput(commonMessage: CommonMessage<MediaContent>) {
         runCatching {
-            logger.info("Received new bot message -> ${objectMapper.writeValueAsString(commonMessage)}")
+            logger.info("Received new media message -> ${objectMapper.writeValueAsString(commonMessage)}")
             BotConfiguration.TG_BOT.withAction(commonMessage.chat.id, TypingAction) {
                 when (commonMessage.content) {
                     is VoiceContent, is AudioContent -> {
