@@ -1,0 +1,17 @@
+ktor:
+  application:
+    modules:
+      - com.trans.transcript.ApplicationKt.module
+  deployment:
+    port: 8095
+
+kafka:
+  groupId: "transcript-service-group"
+  bootstrapServers:
+    - "http://localhost:9092"
+  producerTopics:
+    - name: "transcript-incoming-storage"
+      senderType: "PROCESSING_SENDER"
+  consumerTopics:
+    - name: "transcript-out-storage"
+      handler: "PROCESSING_HANDLER"

@@ -1,0 +1,17 @@
+/.idea/
+/kafka-messaging/build/
+/kafka-messaging/.gradle/
+/kafka-messaging/.kotlin/
+/transf-storage/build/
+/transf-storage/.kotlin/
+/transf-storage/.gradle/
+/transf-transcript-service/.kotlin/
+/transf-transcript-service/build/
+/transf-transcript-service/.gradle/
+/transf-translate-service/.kotlin/
+
+/transf-tg-service/.gradle/
+/transf-tg-service/.kotlin/
+/transf-tg-service/build/
+/transf-translate-service/build/
+/transf-translate-service/.gradle/
